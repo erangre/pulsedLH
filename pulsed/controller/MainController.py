@@ -45,5 +45,7 @@ class MainController(object):
     def update_main_status(self):
         if caget(pulse_PVs['BNC'], as_string=False) == pulse_values['BNC_RUNNING']:
             self.widget.main_status.setText(MAIN_STATUS_ON)
+            self.widget.main_status.setStyleSheet("font: bold 24px; color: red;")
         else:
             self.widget.main_status.setText(MAIN_STATUS_OFF)
+            self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")

@@ -13,4 +13,14 @@ class MainWidget(QtWidgets.QWidget):
 
         self._main_layout = QtWidgets.QVBoxLayout()
 
+        self._outer_layout.addLayout(self._status_layout)
+        self._outer_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum,
+                                                               QtWidgets.QSizePolicy.Expanding))
+        self._outer_layout.addLayout(self._main_layout)
+
         self.main_status = QtWidgets.QLabel()
+
+        self._status_layout.addWidget(self.main_status)
+        self._status_layout.addLayout(self._component_status_layout)
+
+        self.setLayout(self._outer_layout)
