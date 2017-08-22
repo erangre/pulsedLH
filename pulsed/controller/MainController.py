@@ -2,8 +2,14 @@
 import os
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
+
+from epics import caget, caput
+
 from ..widgets.MainWidget import MainWidget
+from .epics_config import pulse_PVs, pulse_values
+
 MAIN_STATUS_OFF = 'Stopped'
+MAIN_STATUS_ON = 'Running'
 
 
 class MainController(object):
@@ -30,11 +36,14 @@ class MainController(object):
         """
         self.widget.show()
 
-        if _platform == "darwin":
-            self.widget.setWindowState(
-                self.widget.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
-            self.widget.activateWindow()
-            self.widget.raise_()
+        # if _platform == "darwin":
+        #     self.widget.setWindowState(
+        #         self.widget.windowState() & ~QtCore.Qt.WindowMinimized | QtCore.Qt.WindowActive)
+        #     self.widget.activateWindow()
+        #     self.widget.raise_()
 
     def update_main_status(self):
-        self.widget.main_status.setText(MAIN_STATUS_OFF)
+        if caget(pulse_PVs['BNC'], as_string=False) == pulse_values['BNC_RUNNING']:
+            self.widget.main_status.setText(MAIN_STATUS_ON)
+        else:
+            self.widget.main_status.setText(MAIN_STATUS_OFF)
