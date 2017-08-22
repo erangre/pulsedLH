@@ -10,6 +10,8 @@ from .epics_config import pulse_PVs, pulse_values
 
 MAIN_STATUS_OFF = 'Stopped'
 MAIN_STATUS_ON = 'Running'
+LASER_STATUS_NORMAL = 'CW'
+LASER_STATUS_PULSED = 'Pulsed'
 
 
 class MainController(object):
@@ -26,6 +28,7 @@ class MainController(object):
         # self.model = pulsed_lh_model()
 
         self.update_main_status()
+        self.update_laser_status()
 
         # if use_settings:
         #     self.load_default_settings()
@@ -49,3 +52,7 @@ class MainController(object):
         else:
             self.widget.main_status.setText(MAIN_STATUS_OFF)
             self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")
+
+    def update_laser_status(self):
+        self.widget.laser_ds_status.setText(LASER_STATUS_NORMAL)
+        self.widget.laser_us_status.setText(LASER_STATUS_NORMAL)

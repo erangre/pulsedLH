@@ -19,6 +19,8 @@ class MainWidget(QtWidgets.QWidget):
         self._outer_layout.addLayout(self._main_layout)
 
         self.main_status = QtWidgets.QLabel()
+        self.laser_ds_status = QtWidgets.QLabel()
+        self.laser_us_status = QtWidgets.QLabel()
 
         self._status_layout.addWidget(self.main_status)
         self._status_layout.addLayout(self._component_status_layout)
