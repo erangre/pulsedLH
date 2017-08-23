@@ -32,6 +32,7 @@ class MainController(object):
         self.update_main_status()
         self.update_laser_status()
         self.update_pimax_status()
+        self.prepare_connections()
 
         # if use_settings:
         #     self.load_default_settings()
@@ -78,3 +79,15 @@ class MainController(object):
         else:
             self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
+
+    def prepare_connections(self):
+        self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
+        self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
+
+    def switch_tabs(self):
+        if self.widget.pulsed_laser_heating_btn.isChecked():
+            self.widget.pulsed_laser_heating_widget.setVisible(True)
+            self.widget.mode_switch_widget.setVisible(False)
+        elif self.widget.mode_switch_btn.isChecked():
+            self.widget.pulsed_laser_heating_widget.setVisible(False)
+            self.widget.mode_switch_widget.setVisible(True)
