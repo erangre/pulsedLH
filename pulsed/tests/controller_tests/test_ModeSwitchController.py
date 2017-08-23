@@ -48,3 +48,10 @@ class ModeSwitchControllerTest(QtTest):
         self.assertEqual(caget(laser_PVs['us_modulation_status']), laser_values['modulation_enabled'])
         self.widget.mode_switch_widget.us_laser_normal_btn.click()
         self.assertEqual(caget(laser_PVs['us_modulation_status']), laser_values['modulation_disabled'])
+
+    def test_switch_pimax_to_pulsed_and_back(self):
+        self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_normal'])
+        self.widget.mode_switch_widget.pimax_to_pulsed_btn.click()
+        self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_pulsed'])
+        self.widget.mode_switch_widget.pimax_to_normal_btn.click()
+        self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_normal'])
