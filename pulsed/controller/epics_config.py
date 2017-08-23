@@ -30,3 +30,17 @@ laser_values = {
     'modulation_enabled': 1,
     'modulation_disabled': 0,
 }
+
+lf_PVs = {
+    'lf_set_experiment': '13IDDLF1:cam1:LFExperimentName',
+    'lf_get_experiment': '13IDDLF1:cam1:LFExperimentName_RBV',
+    'lf_set_trigger_mode': '13IDDLF1:cam1:TriggerMode',
+    'lf_get_trigger_mode': '13IDDLF1:cam1:TriggerMode_RBV',
+    'lf_detector_state': '13IDDLF1:cam1:DetectorState_RBV',
+}
+
+lf_values = {
+    'PIMAX_normal': 'PIMAX_temperature',
+    'PIMAX_pulsed': 'PIMAX_temperature_pulsed',
+    'lf_detector_idle': 'Idle',
+}

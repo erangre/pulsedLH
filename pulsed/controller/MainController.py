@@ -6,12 +6,14 @@ from qtpy import QtWidgets, QtCore
 from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
-from .epics_config import pulse_PVs, pulse_values
+from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values
 
 MAIN_STATUS_OFF = 'Stopped'
 MAIN_STATUS_ON = 'Running'
 LASER_STATUS_NORMAL = 'CW'
 LASER_STATUS_PULSED = 'Pulsed'
+PIMAX_STATUS_NORMAL = 'Normal'
+PIMAX_STATUS_PULSED = 'Pulsed'
 
 
 class MainController(object):
@@ -29,6 +31,7 @@ class MainController(object):
 
         self.update_main_status()
         self.update_laser_status()
+        self.update_pimax_status()
 
         # if use_settings:
         #     self.load_default_settings()
@@ -54,5 +57,24 @@ class MainController(object):
             self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")
 
     def update_laser_status(self):
-        self.widget.laser_ds_status.setText(LASER_STATUS_NORMAL)
-        self.widget.laser_us_status.setText(LASER_STATUS_NORMAL)
+        if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
+            self.widget.laser_ds_status.setText(LASER_STATUS_NORMAL)
+            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_ds_status.setText(LASER_STATUS_PULSED)
+            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: blue;")
+
+        if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
+            self.widget.laser_us_status.setText(LASER_STATUS_NORMAL)
+            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
+            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
+
+    def update_pimax_status(self):
+        if caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:
+            self.widget.pimax_status.setText(PIMAX_STATUS_PULSED)
+            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: blue;")
+        else:
+            self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
+            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
