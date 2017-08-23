@@ -6,6 +6,7 @@ from qtpy import QtWidgets, QtCore
 from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
+from .ModeSwitchController import ModeSwitchController
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values
 
 MAIN_STATUS_OFF = 'Stopped'
@@ -28,6 +29,8 @@ class MainController(object):
             self.settings_directory = settings_directory
 
         # self.model = pulsed_lh_model()
+
+        self.mode_switch_controller = ModeSwitchController(self.widget)
 
         self.update_main_status()
         self.update_laser_status()
