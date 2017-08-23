@@ -19,3 +19,10 @@ class QtTest(unittest.TestCase):
 def delete_if_exists(data_path):
     if os.path.exists(data_path):
         os.remove(data_path)
+
+
+def enter_value_into_text_field(text_field, value):
+    text_field.setText('')
+    QTest.keyClicks(text_field, str(value))
+    QTest.keyPress(text_field, QtCore.Qt.Key_Enter)
+    QtWidgets.QApplication.processEvents()

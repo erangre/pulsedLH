@@ -24,6 +24,10 @@ laser_PVs = {
     'us_enable_modulation': '13IDD:Laser1EnableModulation.PROC',
     'us_disable_modulation': '13IDD:Laser1DisableModulation.PROC',
     'us_modulation_status': '13IDD:Laser1Modulation',
+    'ds_laser_percent': '13IDD:DAC2_4.VAL',
+    'ds_laser_percent_tweak': '13IDD:DAC2_4_tweakVal',
+    'us_laser_percent': '13IDD:DAC2_4.VAL',
+    'us_laser_percent_tweak': '13IDD:DAC2_3_tweakVal',
 }
 
 laser_values = {
