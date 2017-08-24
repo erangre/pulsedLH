@@ -7,18 +7,24 @@ from qtpy import QtWidgets, QtCore
 from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
+from ..model.WidthDelayModel import WidthDelayModel
 from .utils import caput_lf
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, general_PVs, \
     general_values
 
 
-class PulsedHeatingController(object):
+class PulsedHeatingController(QtCore.QObject):
+
+    pulse_changed = QtCore.Signal()
+
     def __init__(self, widget):
+        super(PulsedHeatingController, self).__init__()
         """
         :param widget:
         :type widget: MainWidget
         """
         self.widget = widget.pulsed_laser_heating_widget
+        self.model = WidthDelayModel()
         self.prepare_connections()
 
     def prepare_connections(self):
@@ -34,6 +40,8 @@ class PulsedHeatingController(object):
         self.widget.start_pulse_btn.clicked.connect(self.start_pulse_btn_clicked)
         self.widget.stop_pulse_btn.clicked.connect(self.stop_pulse_btn_clicked)
         self.widget.start_timing_btn.clicked.connect(self.start_timing_btn_clicked)
+
+        self.pulse_changed.connect(self.update_bnc_timings)
 
     def ten_percent_btn_clicked(self):
         caput(laser_PVs['ds_laser_percent'], 10.0, wait=True)
@@ -89,3 +97,16 @@ class PulsedHeatingController(object):
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_NORMAL'], wait=True)
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
+
+    def update_bnc_timings(self):
+        f = 1.0/caget(pulse_PVs['BNC_period'])
+        w = 1.0  # change this to read from settings the pulse width
+        ds_percent = caget(laser_PVs['ds_laser_percent'], as_string=False)
+        us_percent = caget(laser_PVs['us_laser_percent'], as_string=False)
+        timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent)
+        caput(pulse_PVs['BNC_T1_delay'], timings['delay_t1'], wait=True)
+        caput(pulse_PVs['BNC_T2_delay'], timings['delay_t2'], wait=True)
+        caput(pulse_PVs['BNC_T4_delay'], timings['delay_t4'], wait=True)
+        caput(pulse_PVs['BNC_T1_width'], timings['width_t1'], wait=True)
+        caput(pulse_PVs['BNC_T2_width'], timings['width_t2'], wait=True)
+        caput(pulse_PVs['BNC_T4_width'], timings['width_t4'], wait=True)

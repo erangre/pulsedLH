@@ -12,6 +12,7 @@ class WidthDelayModel(object):
         us_delay = self.calc_us_delay(f, us_percent)
         timings['width_t1'] = self.calc_ds_width(f, w, ds_percent) * 1E-6
         timings['width_t2'] = self.calc_us_width(f, w, us_percent) * 1E-6
+        timings['width_t4'] = w * 1E-6
         if us_delay >= ds_delay:
             timings['delay_t1'] = (us_delay - ds_delay) * 1E-6
             timings['delay_t2'] = 0.0

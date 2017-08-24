@@ -3,6 +3,13 @@ bnc_prefix = '13IDD:BNC1:'
 pulse_PVs = {
     'BNC_run': bnc_prefix + 'Run',
     'BNC_mode': bnc_prefix + 'Mode',
+    'BNC_period': bnc_prefix + 'Period',
+    'BNC_T1_width': bnc_prefix + 'P1:Width',
+    'BNC_T2_width': bnc_prefix + 'P2:Width',
+    'BNC_T4_width': bnc_prefix + 'P4:Width',
+    'BNC_T1_delay': bnc_prefix + 'P1:Delay',
+    'BNC_T2_delay': bnc_prefix + 'P2:Delay',
+    'BNC_T4_delay': bnc_prefix + 'P4:Delay',
 }
 
 pulse_values = {
