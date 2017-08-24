@@ -37,11 +37,11 @@ class MainControllerTest(QtTest):
         self.assertEqual(self.widget.main_status.text(), MAIN_STATUS_OFF)
 
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
-        caput(pulse_PVs['BNC'], pulse_values['BNC_RUNNING'], wait=True)
+        caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
 
         self.controller.update_main_status()  # should be updated automatically in future
         self.assertEqual(self.widget.main_status.text(), MAIN_STATUS_ON)
-        caput(pulse_PVs['BNC'], pulse_values['BNC_STOPPED'], wait=True)
+        caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
 
     def test_laser_mode_status_shows_correct_value_on_startup(self):

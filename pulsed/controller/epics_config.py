@@ -1,10 +1,15 @@
+bnc_prefix = '13IDD:BNC1:'
+
 pulse_PVs = {
-    'BNC': '13IDD:BNC1:Run',
+    'BNC_run': bnc_prefix + 'Run',
+    'BNC_mode': bnc_prefix + 'Mode',
 }
 
 pulse_values = {
     'BNC_RUNNING': 1,
     'BNC_STOPPED': 0,
+    'BNC_BURST': 2,
+    'BNC_NORMAL': 0,
 }
 
 general_PVs = {
@@ -26,7 +31,7 @@ laser_PVs = {
     'us_modulation_status': '13IDD:Laser1Modulation',
     'ds_laser_percent': '13IDD:DAC2_4.VAL',
     'ds_laser_percent_tweak': '13IDD:DAC2_4_tweakVal',
-    'us_laser_percent': '13IDD:DAC2_4.VAL',
+    'us_laser_percent': '13IDD:DAC2_3.VAL',
     'us_laser_percent_tweak': '13IDD:DAC2_3_tweakVal',
 }
 
@@ -41,10 +46,14 @@ lf_PVs = {
     'lf_set_trigger_mode': '13IDDLF1:cam1:TriggerMode',
     'lf_get_trigger_mode': '13IDDLF1:cam1:TriggerMode_RBV',
     'lf_detector_state': '13IDDLF1:cam1:DetectorState_RBV',
+    'lf_last_file_name': '13IDDLF1:cam1:LFFileName_RBV',
+    'lf_acquire': '13IDDLF1:cam1:Acquire',
 }
 
 lf_values = {
     'PIMAX_normal': 'PIMAX_temperature',
     'PIMAX_pulsed': 'PIMAX_temperature_pulsed',
     'lf_detector_idle': 'Idle',
+    'lf_Done': 0,
+    'lf_Acquiring': 1,
 }

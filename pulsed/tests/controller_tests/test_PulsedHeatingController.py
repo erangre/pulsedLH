@@ -64,49 +64,82 @@ class PulsedHeatingControllerTest(QtTest):
         enter_value_into_text_field(self.widget.laser_percent_tweak_le, '0.1')
 
     def test_increase_and_decrease_ds(self):
-        step = 0.05
+        step = 0.2
         enter_value_into_text_field(self.widget.laser_percent_tweak_le, str(step))
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), 0.0, places=3)
         self.widget.ds_increase_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), step, places=3)
         self.widget.ds_decrease_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), 0.0, places=3)
 
     def test_increase_and_decrease_us(self):
-        step = 0.05
+        step = 0.2
         enter_value_into_text_field(self.widget.laser_percent_tweak_le, str(step))
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), 0.0, places=3)
-        self.widget.ds_increase_percent_btn.click()
+        self.widget.us_increase_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), step, places=3)
-        self.widget.ds_decrease_percent_btn.click()
+        self.widget.us_decrease_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), 0.0, places=3)
 
     def test_increase_and_decrease_both(self):
-        step = 0.05
+        step = 0.2
         enter_value_into_text_field(self.widget.laser_percent_tweak_le, str(step))
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), 0.0, places=3)
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), 0.0, places=3)
         self.widget.both_increase_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), step, places=3)
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), step, places=3)
         self.widget.both_decrease_percent_btn.click()
+        time.sleep(0.1)
         self.assertAlmostEqual(caget(laser_PVs['us_laser_percent']), 0.0, places=3)
         self.assertAlmostEqual(caget(laser_PVs['ds_laser_percent']), 0.0, places=3)
 
+    def test_run_without_measurement(self):
+        """
+        Real run should change BNC mode to burst and make sure laser shutter is open before starting pulses
+        :return: 
+        """
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_STOPPED'])
+        self.widget.start_pulse_btn.click()
+        time.sleep(0.1)
+        self.assertEqual(caget(general_PVs['laser_shutter_status']), general_values['laser_shutter_clear'])
+        self.assertEqual(caget(pulse_PVs['BNC_mode']), pulse_values['BNC_BURST'])
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_RUNNING'])
+
     def test_stop_btn(self):
-        pass
+        self.widget.start_pulse_btn.click()
+        time.sleep(0.1)
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_RUNNING'])
+        self.widget.stop_pulse_btn.click()
+        time.sleep(0.1)
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_STOPPED'])
 
     def test_timing_btn(self):
-        pass
+        """
+        Timing should change BNC mode to normal and make sure that the laser shutter is closed before starting pulses
+        :return: 
+        """
+        self.widget.start_timing_btn.click()
+        time.sleep(0.1)
+        self.assertEqual(caget(general_PVs['laser_shutter_status']), general_values['laser_shutter_blocking'])
+        self.assertEqual(caget(pulse_PVs['BNC_mode']), pulse_values['BNC_NORMAL'])
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_RUNNING'])
+        self.widget.stop_pulse_btn.click()
 
     def test_run_with_temperature_only(self):
-        pass
+        file_name = caget(lf_PVs['lf_last_file_name'], as_string=True)
+        self.widget.measure_temperature_cb.setChecked(True)
+        self.widget.measure_diffraction_cb.setChecked(False)
+        self.widget.start_pulse_btn.click()
+        self.assertNotEqual(caget(lf_PVs['lf_last_file_name'], as_string=True), file_name)
 
     def test_run_with_xrd_only(self):
         pass
 
     def test_run_with_temp_and_xrd(self):
-        pass
-
-    def test_run_without_measurement(self):
         pass

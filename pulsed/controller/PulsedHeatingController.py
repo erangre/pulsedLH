@@ -8,7 +8,8 @@ from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
 from .utils import caput_lf
-from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values
+from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, general_PVs, \
+    general_values
 
 
 class PulsedHeatingController(object):
@@ -30,6 +31,9 @@ class PulsedHeatingController(object):
         self.widget.us_decrease_percent_btn.clicked.connect(self.us_decrease_percent_btn_clicked)
         self.widget.both_increase_percent_btn.clicked.connect(self.both_increase_percent_btn_clicked)
         self.widget.both_decrease_percent_btn.clicked.connect(self.both_decrease_percent_btn_clicked)
+        self.widget.start_pulse_btn.clicked.connect(self.start_pulse_btn_clicked)
+        self.widget.stop_pulse_btn.clicked.connect(self.stop_pulse_btn_clicked)
+        self.widget.start_timing_btn.clicked.connect(self.start_timing_btn_clicked)
 
     def ten_percent_btn_clicked(self):
         caput(laser_PVs['ds_laser_percent'], 10.0, wait=True)
@@ -70,3 +74,18 @@ class PulsedHeatingController(object):
         caput(dec_pv, 1, wait=True)
         dec_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.A')
         caput(dec_pv, 1, wait=True)
+
+    def start_pulse_btn_clicked(self):
+        caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
+        caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
+        if self.widget.measure_temperature_cb.isChecked():
+            caput(lf_PVs['lf_acquire'], 1, wait=True)
+        caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
+
+    def stop_pulse_btn_clicked(self):
+        caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
+
+    def start_timing_btn_clicked(self):
+        caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        caput(pulse_PVs['BNC_mode'], pulse_values['BNC_NORMAL'], wait=True)
+        caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
