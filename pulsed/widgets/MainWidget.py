@@ -16,11 +16,11 @@ class MainWidget(QtWidgets.QWidget):
         self._tab_layout = QtWidgets.QHBoxLayout()
 
         self._main_layout = QtWidgets.QVBoxLayout()
-
         self._outer_layout.addLayout(self._status_layout)
         self._outer_layout.addSpacerItem(QtWidgets.QSpacerItem(0, 0, QtWidgets.QSizePolicy.Minimum,
-                                                               QtWidgets.QSizePolicy.Expanding))
+                                                               QtWidgets.QSizePolicy.Minimum))
         self._outer_layout.addLayout(self._tab_layout)
+
         self._outer_layout.addLayout(self._main_layout)
 
         self.main_status = QtWidgets.QLabel()
@@ -48,6 +48,7 @@ class MainWidget(QtWidgets.QWidget):
 
         self._status_layout.addWidget(self.main_status)
         self._status_layout.addLayout(self._component_status_layout)
+        self._outer_layout.addStretch(1)
 
         self.pulsed_laser_heating_btn = QtWidgets.QPushButton('Control Laser Heating')
         self.mode_switch_btn = QtWidgets.QPushButton('Switch Modes')
@@ -82,3 +83,15 @@ class MainWidget(QtWidgets.QWidget):
         self.pulsed_laser_heating_btn.setChecked(True)
         self.mode_switch_btn.setChecked(False)
         self.configuration_btn.setChecked(False)
+        self.fix_sizes()
+
+    def fix_sizes(self):
+        tab_rect = QtCore.QRect(11, 139, 477, 23)
+        main_rect = QtCore.QRect(11, 159, 477, 120)
+        outer_rect = QtCore.QRect(0, 0, 499, 316)
+        # widget_rect = QtCore.QRect(640, 340, 499, 442)
+        self._tab_layout.setGeometry(tab_rect)
+        self._main_layout.setGeometry(main_rect)
+        self._outer_layout.setGeometry(outer_rect)
+        self.setMaximumHeight(450)
+        self.setMinimumHeight(450)

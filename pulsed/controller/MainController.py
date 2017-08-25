@@ -2,7 +2,7 @@
 import os
 import time
 from sys import platform as _platform
-from qtpy import QtWidgets, QtCore
+from qtpy import QtWidgets, QtCore, QtGui
 
 from epics import caget, caput, PV
 
@@ -23,7 +23,7 @@ LASER_EMISSION_ON = 'On'
 
 class MainController(QtCore.QObject):
 
-    pv_changed = QtCore.Signal(dict)
+    # pv_changed = QtCore.Signal(dict)
 
     def __init__(self, use_settings=True, settings_directory='default'):
         super(MainController, self).__init__()
@@ -66,10 +66,15 @@ class MainController(QtCore.QObject):
     def prepare_connections(self):
         self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
         self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
-        self.pv_changed.connect(self.pv_changed_emitted)
+        # self.pv_changed.connect(self.pv_changed_emitted)
         self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
+        self.callbacks[laser_PVs['ds_emission_status']] = self.update_ds_laser_emission_status
+        self.callbacks[laser_PVs['us_emission_status']] = self.update_us_laser_emission_status
+        self.callbacks[laser_PVs['ds_modulation_status']] = self.update_ds_laser_modulation_status
+        self.callbacks[laser_PVs['us_modulation_status']] = self.update_us_laser_modulation_status
+        self.callbacks[lf_PVs['lf_get_experiment']] = self.update_pimax_status
 
-    def update_main_status(self, value=None):
+    def update_main_status(self, value=None, char_value=None):
         if value is None:
             value = caget(pulse_PVs['BNC_run'], as_string=False)
         if value == pulse_values['BNC_RUNNING']:
@@ -79,37 +84,56 @@ class MainController(QtCore.QObject):
             self.widget.main_status.setText(MAIN_STATUS_OFF)
             self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")
 
-    def update_laser_status(self):
-        if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
-            self.widget.laser_ds_status.setText(LASER_STATUS_NORMAL)
-            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: black;")
-        else:
-            self.widget.laser_ds_status.setText(LASER_STATUS_PULSED)
-            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: blue;")
-
-        if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
-            self.widget.laser_us_status.setText(LASER_STATUS_NORMAL)
-            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: black;")
-        else:
-            self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
-            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
-
-        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off']:
+    def update_ds_laser_emission_status(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['ds_emission_status'])
+        if value == laser_values['emission_off']:
             self.widget.laser_ds_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: black;")
         else:
             self.widget.laser_ds_emission_status.setText(LASER_EMISSION_ON)
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: red;")
 
-        if caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+    def update_us_laser_emission_status(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['us_emission_status'])
+        if value == laser_values['emission_off']:
             self.widget.laser_us_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: black;")
         else:
             self.widget.laser_us_emission_status.setText(LASER_EMISSION_ON)
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: red;")
 
-    def update_pimax_status(self):
-        if caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:
+    def update_ds_laser_modulation_status(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['ds_modulation_status'])
+        if value == laser_values['modulation_disabled']:
+            self.widget.laser_ds_status.setText(LASER_STATUS_NORMAL)
+            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_ds_status.setText(LASER_STATUS_PULSED)
+            self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: blue;")
+
+    def update_us_laser_modulation_status(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['us_modulation_status'])
+        if value == laser_values['modulation_disabled']:
+            self.widget.laser_us_status.setText(LASER_STATUS_NORMAL)
+            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
+            self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
+
+    def update_laser_status(self):
+        self.update_ds_laser_emission_status()
+        self.update_us_laser_emission_status()
+        self.update_ds_laser_modulation_status()
+        self.update_us_laser_modulation_status()
+
+    def update_pimax_status(self, value=None, char_value=None):
+        if char_value is None:
+            char_value = caget(lf_PVs['lf_get_experiment'], as_string=True)
+        if char_value == lf_values['PIMAX_pulsed']:
             self.widget.pimax_status.setText(PIMAX_STATUS_PULSED)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: blue;")
         else:
@@ -123,24 +147,39 @@ class MainController(QtCore.QObject):
         elif self.widget.mode_switch_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(False)
             self.widget.mode_switch_widget.setVisible(True)
+        self.widget.fix_sizes()
+
 
     def create_monitors(self):
         self.pv_bnc_running = PV(pulse_PVs['BNC_run'])
         self.pv_bnc_running.add_callback(self.pv_changed_value)
 
+        self.ds_laser_emission = PV(laser_PVs['ds_emission_status'])
+        self.ds_laser_emission.add_callback(self.pv_changed_value)
+        self.us_laser_emission = PV(laser_PVs['us_emission_status'])
+        self.us_laser_emission.add_callback(self.pv_changed_value)
+
+        self.ds_laser_modulation = PV(laser_PVs['ds_modulation_status'])
+        self.ds_laser_modulation.add_callback(self.pv_changed_value)
+        self.us_laser_modulation = PV(laser_PVs['us_modulation_status'])
+        self.us_laser_modulation.add_callback(self.pv_changed_value)
+
+        self.pimax_experiment = PV(lf_PVs['lf_get_experiment'])
+        self.pimax_experiment.add_callback(self.pv_changed_value)
+
     def pv_changed_value(self, **kwargs):
-        print("before emitting")
-        t0 = time.time()
-
-        self.pv_changed.emit(kwargs)
-        print(time.time() - t0)
-        print("after emitting")
-
-    def pv_changed_emitted(self, kwargs):
-        print("signal emitted")
         current_callback = self.callbacks[kwargs.get('pvname', None)]
         if current_callback:
-            current_callback(kwargs.get('value', None))
+            current_callback(kwargs.get('value', None), kwargs.get('char_value', None))
         print(kwargs['pvname'])
         print(kwargs['value'])
         print(kwargs['char_value'])
+
+    # def pv_changed_emitted(self, kwargs):
+    #     print("signal emitted")
+    #     current_callback = self.callbacks[kwargs.get('pvname', None)]
+    #     if current_callback:
+    #         current_callback(kwargs.get('value', None))
+    #     print(kwargs['pvname'])
+    #     print(kwargs['value'])
+    #     print(kwargs['char_value'])
