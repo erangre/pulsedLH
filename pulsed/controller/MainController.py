@@ -1,9 +1,10 @@
 # -*- coding: utf8 -*-
 import os
+import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
 
-from epics import caget, caput
+from epics import caget, caput, PV
 
 from ..widgets.MainWidget import MainWidget
 from .ModeSwitchController import ModeSwitchController
@@ -20,9 +21,14 @@ LASER_EMISSION_OFF = 'Off'
 LASER_EMISSION_ON = 'On'
 
 
-class MainController(object):
+class MainController(QtCore.QObject):
+
+    pv_changed = QtCore.Signal(dict)
+
     def __init__(self, use_settings=True, settings_directory='default'):
+        super(MainController, self).__init__()
         self.use_settings = use_settings
+        self.callbacks = {}
         self.widget = MainWidget()
 
         # create data
@@ -40,6 +46,7 @@ class MainController(object):
         self.update_laser_status()
         self.update_pimax_status()
         self.prepare_connections()
+        self.create_monitors()
 
         # if use_settings:
         #     self.load_default_settings()
@@ -56,8 +63,16 @@ class MainController(object):
         #     self.widget.activateWindow()
         #     self.widget.raise_()
 
-    def update_main_status(self):
-        if caget(pulse_PVs['BNC_run'], as_string=False) == pulse_values['BNC_RUNNING']:
+    def prepare_connections(self):
+        self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
+        self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
+        self.pv_changed.connect(self.pv_changed_emitted)
+        self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
+
+    def update_main_status(self, value=None):
+        if value is None:
+            value = caget(pulse_PVs['BNC_run'], as_string=False)
+        if value == pulse_values['BNC_RUNNING']:
             self.widget.main_status.setText(MAIN_STATUS_ON)
             self.widget.main_status.setStyleSheet("font: bold 24px; color: red;")
         else:
@@ -101,10 +116,6 @@ class MainController(object):
             self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
 
-    def prepare_connections(self):
-        self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
-        self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
-
     def switch_tabs(self):
         if self.widget.pulsed_laser_heating_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(True)
@@ -112,3 +123,24 @@ class MainController(object):
         elif self.widget.mode_switch_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(False)
             self.widget.mode_switch_widget.setVisible(True)
+
+    def create_monitors(self):
+        self.pv_bnc_running = PV(pulse_PVs['BNC_run'])
+        self.pv_bnc_running.add_callback(self.pv_changed_value)
+
+    def pv_changed_value(self, **kwargs):
+        print("before emitting")
+        t0 = time.time()
+
+        self.pv_changed.emit(kwargs)
+        print(time.time() - t0)
+        print("after emitting")
+
+    def pv_changed_emitted(self, kwargs):
+        print("signal emitted")
+        current_callback = self.callbacks[kwargs.get('pvname', None)]
+        if current_callback:
+            current_callback(kwargs.get('value', None))
+        print(kwargs['pvname'])
+        print(kwargs['value'])
+        print(kwargs['char_value'])
