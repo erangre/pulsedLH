@@ -19,7 +19,9 @@ PIMAX_STATUS_NORMAL = 'Normal'
 PIMAX_STATUS_PULSED = 'Pulsed'
 LASER_EMISSION_OFF = 'Off'
 LASER_EMISSION_ON = 'On'
-
+MODE_PULSED = 'Pulsed Mode'
+MODE_NORMAL = 'CW Mode'
+MODE_MIXED = 'Warning: Mixed Mode!'
 
 class MainController(QtCore.QObject):
 
@@ -45,6 +47,7 @@ class MainController(QtCore.QObject):
         self.update_main_status()
         self.update_laser_status()
         self.update_pimax_status()
+        self.update_main_mode_status()
         self.prepare_connections()
         self.create_monitors()
 
@@ -84,15 +87,38 @@ class MainController(QtCore.QObject):
             self.widget.main_status.setText(MAIN_STATUS_OFF)
             self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")
 
+    def update_main_mode_status(self):
+        count_pulsed = 0
+        if self.widget.laser_ds_status.text() == LASER_STATUS_PULSED:
+            count_pulsed += 1
+        if self.widget.laser_us_status.text() == LASER_STATUS_PULSED:
+            count_pulsed += 1
+        if self.widget.pimax_status.text() == PIMAX_STATUS_PULSED:
+            count_pulsed += 1
+
+        if count_pulsed == 3:
+            self.widget.main_mode_status.setText(MODE_PULSED)
+            self.widget.main_mode_status.setStyleSheet("font: bold 24px; color: blue;")
+        elif count_pulsed == 0:
+            self.widget.main_mode_status.setText(MODE_NORMAL)
+            self.widget.main_mode_status.setStyleSheet("font: bold 24px; color: black;")
+        else:
+            self.widget.main_mode_status.setText(MODE_MIXED)
+            self.widget.main_mode_status.setStyleSheet("font: bold 24px; color: red;")
+
     def update_ds_laser_emission_status(self, value=None, char_value=None):
         if value is None:
             value = caget(laser_PVs['ds_emission_status'])
         if value == laser_values['emission_off']:
             self.widget.laser_ds_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: black;")
+            self.widget.mode_switch_widget.ds_laser_normal_btn.setEnabled(True)
+            self.widget.mode_switch_widget.ds_laser_pulsed_btn.setEnabled(True)
         else:
             self.widget.laser_ds_emission_status.setText(LASER_EMISSION_ON)
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: red;")
+            self.widget.mode_switch_widget.ds_laser_normal_btn.setEnabled(False)
+            self.widget.mode_switch_widget.ds_laser_pulsed_btn.setEnabled(False)
 
     def update_us_laser_emission_status(self, value=None, char_value=None):
         if value is None:
@@ -100,9 +126,13 @@ class MainController(QtCore.QObject):
         if value == laser_values['emission_off']:
             self.widget.laser_us_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: black;")
+            self.widget.mode_switch_widget.us_laser_normal_btn.setEnabled(True)
+            self.widget.mode_switch_widget.us_laser_pulsed_btn.setEnabled(True)
         else:
             self.widget.laser_us_emission_status.setText(LASER_EMISSION_ON)
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: red;")
+            self.widget.mode_switch_widget.us_laser_normal_btn.setEnabled(False)
+            self.widget.mode_switch_widget.us_laser_pulsed_btn.setEnabled(False)
 
     def update_ds_laser_modulation_status(self, value=None, char_value=None):
         if value is None:
@@ -113,6 +143,7 @@ class MainController(QtCore.QObject):
         else:
             self.widget.laser_ds_status.setText(LASER_STATUS_PULSED)
             self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: blue;")
+        self.update_main_mode_status()
 
     def update_us_laser_modulation_status(self, value=None, char_value=None):
         if value is None:
@@ -123,6 +154,7 @@ class MainController(QtCore.QObject):
         else:
             self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
             self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
+        self.update_main_mode_status()
 
     def update_laser_status(self):
         self.update_ds_laser_emission_status()
@@ -139,6 +171,7 @@ class MainController(QtCore.QObject):
         else:
             self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
+        self.update_main_mode_status()
 
     def switch_tabs(self):
         if self.widget.pulsed_laser_heating_btn.isChecked():
@@ -171,9 +204,6 @@ class MainController(QtCore.QObject):
         current_callback = self.callbacks[kwargs.get('pvname', None)]
         if current_callback:
             current_callback(kwargs.get('value', None), kwargs.get('char_value', None))
-        print(kwargs['pvname'])
-        print(kwargs['value'])
-        print(kwargs['char_value'])
 
     # def pv_changed_emitted(self, kwargs):
     #     print("signal emitted")

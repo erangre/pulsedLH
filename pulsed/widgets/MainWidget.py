@@ -24,6 +24,7 @@ class MainWidget(QtWidgets.QWidget):
         self._outer_layout.addLayout(self._main_layout)
 
         self.main_status = QtWidgets.QLabel()
+        self.main_mode_status = QtWidgets.QLabel()
         self.laser_ds_status_lbl = QtWidgets.QLabel('DS Laser Mode:')
         self.laser_ds_status = QtWidgets.QLabel()
         self.laser_us_status_lbl = QtWidgets.QLabel('US Laser Mode:')
@@ -47,6 +48,7 @@ class MainWidget(QtWidgets.QWidget):
         self._component_status_layout.addWidget(self.pimax_status, 2, 1)
 
         self._status_layout.addWidget(self.main_status)
+        self._status_layout.addWidget(self.main_mode_status)
         self._status_layout.addLayout(self._component_status_layout)
         self._outer_layout.addStretch(1)
 
