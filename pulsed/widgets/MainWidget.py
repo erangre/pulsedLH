@@ -11,7 +11,7 @@ class MainWidget(QtWidgets.QWidget):
         self._outer_layout = QtWidgets.QVBoxLayout()
 
         self._status_layout = QtWidgets.QVBoxLayout()
-        self._component_status_layout = QtWidgets.QHBoxLayout()
+        self._component_status_layout = QtWidgets.QGridLayout()
         self._tab_button_group = QtWidgets.QButtonGroup()
         self._tab_layout = QtWidgets.QHBoxLayout()
 
@@ -28,15 +28,23 @@ class MainWidget(QtWidgets.QWidget):
         self.laser_ds_status = QtWidgets.QLabel()
         self.laser_us_status_lbl = QtWidgets.QLabel('US Laser Mode:')
         self.laser_us_status = QtWidgets.QLabel()
+        self.laser_ds_emission_status_lbl = QtWidgets.QLabel('DS Emission:')
+        self.laser_ds_emission_status = QtWidgets.QLabel()
+        self.laser_us_emission_status_lbl = QtWidgets.QLabel('US Emission:')
+        self.laser_us_emission_status = QtWidgets.QLabel()
         self.pimax_status_lbl = QtWidgets.QLabel('Pimax Mode:')
         self.pimax_status = QtWidgets.QLabel()
 
-        self._component_status_layout.addWidget(self.laser_ds_status_lbl)
-        self._component_status_layout.addWidget(self.laser_ds_status)
-        self._component_status_layout.addWidget(self.laser_us_status_lbl)
-        self._component_status_layout.addWidget(self.laser_us_status)
-        self._component_status_layout.addWidget(self.pimax_status_lbl)
-        self._component_status_layout.addWidget(self.pimax_status)
+        self._component_status_layout.addWidget(self.laser_ds_emission_status_lbl, 0, 0)
+        self._component_status_layout.addWidget(self.laser_ds_emission_status, 0, 1)
+        self._component_status_layout.addWidget(self.laser_us_emission_status_lbl, 0, 2)
+        self._component_status_layout.addWidget(self.laser_us_emission_status, 0, 3)
+        self._component_status_layout.addWidget(self.laser_ds_status_lbl, 1, 0)
+        self._component_status_layout.addWidget(self.laser_ds_status, 1, 1)
+        self._component_status_layout.addWidget(self.laser_us_status_lbl, 1, 2)
+        self._component_status_layout.addWidget(self.laser_us_status, 1, 3)
+        self._component_status_layout.addWidget(self.pimax_status_lbl, 2, 0)
+        self._component_status_layout.addWidget(self.pimax_status, 2, 1)
 
         self._status_layout.addWidget(self.main_status)
         self._status_layout.addLayout(self._component_status_layout)
@@ -63,6 +71,8 @@ class MainWidget(QtWidgets.QWidget):
         self.style_widgets()
 
     def style_widgets(self):
+        self.laser_ds_emission_status_lbl.setStyleSheet("font: 18px; color: black;")
+        self.laser_us_emission_status_lbl.setStyleSheet("font: 18px; color: black;")
         self.laser_ds_status_lbl.setStyleSheet("font: 18px; color: black;")
         self.laser_us_status_lbl.setStyleSheet("font: 18px; color: black;")
         self.pimax_status_lbl.setStyleSheet("font: 18px; color: black;")

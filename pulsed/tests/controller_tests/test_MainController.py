@@ -15,7 +15,7 @@ from qtpy.QtTest import QTest
 
 from ...controller.MainController import MainController
 from ...controller.MainController import MAIN_STATUS_OFF, MAIN_STATUS_ON, LASER_STATUS_NORMAL, LASER_STATUS_PULSED, \
-    PIMAX_STATUS_NORMAL, PIMAX_STATUS_PULSED
+    PIMAX_STATUS_NORMAL, PIMAX_STATUS_PULSED, LASER_EMISSION_OFF, LASER_EMISSION_ON
 from ...controller.epics_config import pulse_PVs, general_PVs, pulse_values, general_values, laser_PVs, laser_values, \
     lf_PVs, lf_values
 from ...controller.utils import caput_lf
@@ -75,3 +75,7 @@ class MainControllerTest(QtTest):
         self.widget.pulsed_laser_heating_btn.click()
         self.assertTrue(self.widget.pulsed_laser_heating_widget.isVisible())
         self.assertFalse(self.widget.mode_switch_widget.isVisible())
+
+    def test_laser_emission_status_shows_correct_value_on_startup(self):
+        self.assertEqual(self.widget.laser_ds_emission_status.text(), LASER_EMISSION_OFF)
+        self.assertEqual(self.widget.laser_us_emission_status.text(), LASER_EMISSION_OFF)

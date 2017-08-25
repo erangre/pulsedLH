@@ -26,6 +26,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget = widget.pulsed_laser_heating_widget
         self.model = WidthDelayModel()
         self.prepare_connections()
+        self.laser_percent_tweak_le_editing_finished()
 
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
@@ -46,10 +47,12 @@ class PulsedHeatingController(QtCore.QObject):
     def ten_percent_btn_clicked(self):
         caput(laser_PVs['ds_laser_percent'], 10.0, wait=True)
         caput(laser_PVs['us_laser_percent'], 10.0, wait=True)
+        self.pulse_changed.emit()
 
     def zero_btn_clicked(self):
         caput(laser_PVs['ds_laser_percent'], 0.0, wait=True)
         caput(laser_PVs['us_laser_percent'], 0.0, wait=True)
+        self.pulse_changed.emit()
 
     def laser_percent_tweak_le_editing_finished(self):
         caput(laser_PVs['ds_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)
@@ -58,30 +61,36 @@ class PulsedHeatingController(QtCore.QObject):
     def ds_increase_percent_btn_clicked(self):
         inc_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.B')
         caput(inc_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def ds_decrease_percent_btn_clicked(self):
         dec_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.A')
         caput(dec_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def us_increase_percent_btn_clicked(self):
         inc_pv = laser_PVs['us_laser_percent_tweak'].replace('Val', '.B')
         caput(inc_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def us_decrease_percent_btn_clicked(self):
         dec_pv = laser_PVs['us_laser_percent_tweak'].replace('Val', '.A')
         caput(dec_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def both_increase_percent_btn_clicked(self):
         inc_pv = laser_PVs['us_laser_percent_tweak'].replace('Val', '.B')
         caput(inc_pv, 1, wait=True)
         inc_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.B')
         caput(inc_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def both_decrease_percent_btn_clicked(self):
         dec_pv = laser_PVs['us_laser_percent_tweak'].replace('Val', '.A')
         caput(dec_pv, 1, wait=True)
         dec_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.A')
         caput(dec_pv, 1, wait=True)
+        self.pulse_changed.emit()
 
     def start_pulse_btn_clicked(self):
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)

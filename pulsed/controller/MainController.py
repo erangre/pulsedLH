@@ -16,6 +16,8 @@ LASER_STATUS_NORMAL = 'CW'
 LASER_STATUS_PULSED = 'Pulsed'
 PIMAX_STATUS_NORMAL = 'Normal'
 PIMAX_STATUS_PULSED = 'Pulsed'
+LASER_EMISSION_OFF = 'Off'
+LASER_EMISSION_ON = 'On'
 
 
 class MainController(object):
@@ -76,6 +78,20 @@ class MainController(object):
         else:
             self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
             self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
+
+        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off']:
+            self.widget.laser_ds_emission_status.setText(LASER_EMISSION_OFF)
+            self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_ds_emission_status.setText(LASER_EMISSION_ON)
+            self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: red;")
+
+        if caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+            self.widget.laser_us_emission_status.setText(LASER_EMISSION_OFF)
+            self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: black;")
+        else:
+            self.widget.laser_us_emission_status.setText(LASER_EMISSION_ON)
+            self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: red;")
 
     def update_pimax_status(self):
         if caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:

@@ -8,8 +8,15 @@ class WidthDelayModel(object):
 
     def calc_all_delays_and_widths(self, f=10000, w=1.0, ds_percent=0.0, us_percent=0.0):
         timings = {}
-        ds_delay = self.calc_ds_delay(f, ds_percent)
-        us_delay = self.calc_us_delay(f, us_percent)
+        if ds_percent < 10.0:
+            ds_delay = 0.0
+        else:
+            ds_delay = self.calc_ds_delay(f, ds_percent)
+
+        if us_percent < 10.0:
+            us_delay = 0.0
+        else:
+            us_delay = self.calc_us_delay(f, us_percent)
         timings['width_t1'] = self.calc_ds_width(f, w, ds_percent) * 1E-6
         timings['width_t2'] = self.calc_us_width(f, w, us_percent) * 1E-6
         timings['width_t4'] = w * 1E-6
