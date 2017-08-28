@@ -143,3 +143,25 @@ class PulsedHeatingControllerTest(QtTest):
 
     def test_run_with_temp_and_xrd(self):
         pass
+
+    def test_timing_labels_update(self):
+        self.assertEqual(float(self.widget.ds_width_le.text()), 1)
+        self.assertEqual(float(self.widget.ds_delay_le.text()), 0)
+        self.assertEqual(float(self.widget.us_width_le.text()), 1)
+        self.assertEqual(float(self.widget.us_delay_le.text()), 0)
+
+        self.widget.ten_percent_btn.click()
+        self.assertAlmostEqual(float(self.widget.ds_width_le.text()), caget(pulse_PVs['BNC_T1_width'])*1E6, places=2)
+        self.assertAlmostEqual(float(self.widget.us_width_le.text()), caget(pulse_PVs['BNC_T2_width'])*1E6, places=2)
+        self.assertAlmostEqual(float(self.widget.ds_delay_le.text()), caget(pulse_PVs['BNC_T1_delay'])*1E6, places=2)
+        self.assertAlmostEqual(float(self.widget.us_delay_le.text()), caget(pulse_PVs['BNC_T2_delay'])*1E6, places=2)
+
+        self.widget.zero_btn.click()
+
+    def test_laser_percent_change_updates_text(self):
+        self.widget.zero_btn.click()
+        self.assertAlmostEqual(float(self.widget.ds_percent_display_le.text()), 0.0, places=2)
+        step_value = 0.2
+        enter_value_into_text_field(self.widget.laser_percent_tweak_le, str(step_value))
+        self.widget.both_increase_percent_btn.click()
+        self.assertAlmostEqual(float(self.widget.ds_percent_display_le.text()), step_value, places=2)

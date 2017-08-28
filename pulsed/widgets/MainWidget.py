@@ -88,6 +88,7 @@ class MainWidget(QtWidgets.QWidget):
         self.fix_sizes()
 
     def fix_sizes(self):
+        # TODO - find a better way to control size of app when changing tabs
         tab_rect = QtCore.QRect(11, 139, 477, 23)
         main_rect = QtCore.QRect(11, 159, 477, 120)
         outer_rect = QtCore.QRect(0, 0, 499, 316)

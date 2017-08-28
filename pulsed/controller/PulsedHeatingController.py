@@ -18,11 +18,11 @@ class PulsedHeatingController(QtCore.QObject):
     pulse_changed = QtCore.Signal()
 
     def __init__(self, widget):
-        super(PulsedHeatingController, self).__init__()
         """
         :param widget:
-        :type widget: MainWidget
+        :type widget MainWidget
         """
+        super(PulsedHeatingController, self).__init__()
         self.widget = widget.pulsed_laser_heating_widget
         self.model = WidthDelayModel()
         self.prepare_connections()
@@ -103,13 +103,16 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
 
     def start_timing_btn_clicked(self):
+        # TODO read the current num of pulses, change to X seconds for alignment, then change back to original num
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
-        caput(pulse_PVs['BNC_mode'], pulse_values['BNC_NORMAL'], wait=True)
+        caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
 
     def update_bnc_timings(self):
+        self.toggle_percent_btns(False)
+        QtWidgets.QApplication.processEvents()
         f = 1.0/caget(pulse_PVs['BNC_period'])
-        w = 1.0  # change this to read from settings the pulse width
+        w = 1.0  # TODO change this to read from settings the pulse width
         ds_percent = caget(laser_PVs['ds_laser_percent'], as_string=False)
         us_percent = caget(laser_PVs['us_laser_percent'], as_string=False)
         timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent)
@@ -119,3 +122,19 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_T1_width'], timings['width_t1'], wait=True)
         caput(pulse_PVs['BNC_T2_width'], timings['width_t2'], wait=True)
         caput(pulse_PVs['BNC_T4_width'], timings['width_t4'], wait=True)
+        self.widget.update_timing_labels(timings)
+        self.toggle_percent_btns(True)
+
+    def ds_laser_percent_changed(self, value=None, char_value=None):
+        self.widget.ds_percent_display_le.setText(str(round(value, 2)))
+
+    def us_laser_percent_changed(self, value=None, char_value=None):
+        self.widget.us_percent_display_le.setText(str(round(value, 2)))
+
+    def toggle_percent_btns(self, toggle):
+        self.widget.both_increase_percent_btn.setEnabled(toggle)
+        self.widget.both_decrease_percent_btn.setEnabled(toggle)
+        self.widget.ds_increase_percent_btn.setEnabled(toggle)
+        self.widget.ds_decrease_percent_btn.setEnabled(toggle)
+        self.widget.us_increase_percent_btn.setEnabled(toggle)
+        self.widget.us_decrease_percent_btn.setEnabled(toggle)

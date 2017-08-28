@@ -75,6 +75,7 @@ class MainControllerTest(QtTest):
         self.assertFalse(self.widget.mode_switch_widget.isVisible())
 
     def test_laser_emission_status_shows_correct_value_on_startup(self):
+        # TODO - when emission can be controlled by software, modify this
         # need to find way to test this for changes. Feature works,
         # but not the test since emission cannot be controlled programmatically.
         self.assertEqual(self.widget.laser_ds_emission_status.text(), LASER_EMISSION_OFF)

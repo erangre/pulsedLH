@@ -29,6 +29,8 @@ general_values = {
     'laser_shutter_clear': 1,
 }
 
+# TODO - maybe change to a prefix like for BNC
+
 laser_PVs = {
     'ds_enable_modulation': '13IDD:Laser2EnableModulation.PROC',
     'ds_disable_modulation': '13IDD:Laser2DisableModulation.PROC',

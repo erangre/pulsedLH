@@ -36,7 +36,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_enabled']:
                 return
-            # Add here error message that DS laser cannot be changed to pulsed
+            # TODO Add here error message that DS laser cannot be changed to pulsed
 
     def ds_laser_normal_btn_clicked(self):
         t0 = time.time()
@@ -44,7 +44,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
                 return
-            # Add here error message that DS laser cannot be changed to normal
+            # TODO Add here error message that DS laser cannot be changed to normal
 
     def us_laser_pulsed_btn_clicked(self):
         t0 = time.time()
@@ -52,7 +52,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_enabled']:
                 return
-            # Add here error message that DS laser cannot be changed to pulsed
+            # TODO Add here error message that DS laser cannot be changed to pulsed
 
     def us_laser_normal_btn_clicked(self):
         t0 = time.time()
@@ -60,7 +60,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
                 return
-            # Add here error message that DS laser cannot be changed to normal
+            # TODO Add here error message that DS laser cannot be changed to normal
 
     def update_laser_btns_state(self):
         if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_enabled']:

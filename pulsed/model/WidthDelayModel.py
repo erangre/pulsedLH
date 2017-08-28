@@ -10,15 +10,18 @@ class WidthDelayModel(object):
         timings = {}
         if ds_percent < 10.0:
             ds_delay = 0.0
+            timings['width_t1'] = 1E-6
         else:
             ds_delay = self.calc_ds_delay(f, ds_percent)
+            timings['width_t1'] = self.calc_ds_width(f, w, ds_percent) * 1E-6
 
         if us_percent < 10.0:
             us_delay = 0.0
+            timings['width_t2'] = 1E-6
         else:
             us_delay = self.calc_us_delay(f, us_percent)
-        timings['width_t1'] = self.calc_ds_width(f, w, ds_percent) * 1E-6
-        timings['width_t2'] = self.calc_us_width(f, w, us_percent) * 1E-6
+            timings['width_t2'] = self.calc_us_width(f, w, us_percent) * 1E-6
+
         timings['width_t4'] = w * 1E-6
         if us_delay >= ds_delay:
             timings['delay_t1'] = (us_delay - ds_delay) * 1E-6
@@ -29,6 +32,9 @@ class WidthDelayModel(object):
             timings['delay_t2'] = (ds_delay - us_delay) * 1E-6
             timings['delay_t4'] = ds_delay * 1E-6
         return timings
+
+    # TODO - find out how to make it general for f, and not just 2k and 10k
+    # TODO - find out how to better estimate T4 delay
 
     def calc_ds_delay(self, f=10000, ds_percent=0.0):
         x = ds_percent
