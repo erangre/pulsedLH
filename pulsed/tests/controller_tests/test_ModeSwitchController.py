@@ -17,7 +17,7 @@ from ...controller.MainController import MainController
 from ...controller.MainController import MAIN_STATUS_OFF, MAIN_STATUS_ON, LASER_STATUS_NORMAL, LASER_STATUS_PULSED, \
     PIMAX_STATUS_NORMAL, PIMAX_STATUS_PULSED
 from ...controller.epics_config import pulse_PVs, general_PVs, pulse_values, general_values, laser_PVs, laser_values, \
-    lf_PVs, lf_values
+    lf_PVs, lf_values, pil3_PVs, pil3_values
 from ...controller.utils import caput_lf
 
 unittest_data_path = os.path.join(os.path.dirname(__file__), '../data')
@@ -56,6 +56,12 @@ class ModeSwitchControllerTest(QtTest):
         self.widget.mode_switch_widget.pimax_to_normal_btn.click()
         self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_normal'])
 
+    def test_switch_pilatus_to_pulsed_and_back(self):
+        self.assertEqual(caget(pil3_PVs['trigger_mode']), pil3_values['trigger_internal'])
+        self.widget.mode_switch_widget.pil3_pulsed.btn.click()
+        self.assertEqual(caget(pil3_PVs['trigger_mode']), pil3_values['trigger_external_enable'])
+        self.widget.mode_switch_widget.pil3_normal.btn.click()
+
     def test_switch_all_to_pulsed_and_back(self):
         self.assertTrue(self.widget.mode_switch_widget.ds_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.us_laser_normal_btn.isChecked())
@@ -68,4 +74,6 @@ class ModeSwitchControllerTest(QtTest):
         self.assertTrue(self.widget.mode_switch_widget.ds_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.us_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.pimax_to_normal_btn.isChecked())
+
         # TODO add Pilatus change mode to this
+

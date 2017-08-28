@@ -33,6 +33,13 @@ class ModeSwitchWidget(QtWidgets.QGroupBox):
         self.pimax_btn_group.addButton(self.pimax_to_normal_btn)
         self.pimax_btn_group.addButton(self.pimax_to_pulsed_btn)
 
+        self.pil3_lbl = QtWidgets.QLabel('Pilatus 3 Mode:')
+        self.pil3_to_normal_btn = QtWidgets.QPushButton('Normal')
+        self.pil3_to_pulsed_btn = QtWidgets.QPushButton('Pulsed')
+        self.pil3_btn_group = QtWidgets.QButtonGroup()
+        self.pil3_btn_group.addButton(self.pil3_to_normal_btn)
+        self.pil3_btn_group.addButton(self.pil3_to_pulsed_btn)
+
         self.all_lbl = QtWidgets.QLabel('All Mode:')
         self.all_to_normal_btn = QtWidgets.QPushButton('Normal')
         self.all_to_pulsed_btn = QtWidgets.QPushButton('Pulsed')
@@ -50,9 +57,12 @@ class ModeSwitchWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.pimax_lbl, 2, 0)
         self._grid_layout.addWidget(self.pimax_to_normal_btn, 2, 1)
         self._grid_layout.addWidget(self.pimax_to_pulsed_btn, 2, 2)
-        self._grid_layout.addWidget(self.all_lbl, 3, 0)
-        self._grid_layout.addWidget(self.all_to_normal_btn, 3, 1)
-        self._grid_layout.addWidget(self.all_to_pulsed_btn, 3, 2)
+        self._grid_layout.addWidget(self.pil3_lbl, 3, 0)
+        self._grid_layout.addWidget(self.pil3_to_normal_btn, 3, 1)
+        self._grid_layout.addWidget(self.pil3_to_pulsed_btn, 3, 2)
+        self._grid_layout.addWidget(self.all_lbl, 4, 0)
+        self._grid_layout.addWidget(self.all_to_normal_btn, 4, 1)
+        self._grid_layout.addWidget(self.all_to_pulsed_btn, 4, 2)
 
         self.setLayout(self._main_layout)
 
@@ -65,3 +75,5 @@ class ModeSwitchWidget(QtWidgets.QGroupBox):
         self.us_laser_pulsed_btn.setCheckable(True)
         self.pimax_to_normal_btn.setCheckable(True)
         self.pimax_to_pulsed_btn.setCheckable(True)
+        self.pil3_to_normal_btn.setCheckable(True)
+        self.pil3_to_pulsed_btn.setCheckable(True)

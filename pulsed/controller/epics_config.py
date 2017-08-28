@@ -27,11 +27,14 @@ pulse_values = {
 general_PVs = {
     'laser_shutter_status': '13IDD:Unidig2Bi4.VAL',
     'laser_shutter_control': '13IDD:Unidig2Bo4.VAL',
+    'pilatus_gate_control': '13IDD:Unidig2Bo20',
 }
 
 general_values = {
     'laser_shutter_blocking': 0,
     'laser_shutter_clear': 1,
+    'pilatus_gate_control_BNC': 1,
+    'pilatus_gate_control_XPS': 0,
 }
 
 # TODO - maybe change to a prefix like for BNC
@@ -74,4 +77,20 @@ lf_values = {
     'lf_detector_idle': 'Idle',
     'lf_Done': 0,
     'lf_Acquiring': 1,
+}
+
+pil3_prefix = '13PIL3:came:'
+
+pil3_PVs = {
+    'trigger_mode': pil3_prefix + 'TriggerMode',
+    'exposures_per_image': pil3_prefix + 'NumExposures',
+    'exposure_time': pil3_prefix + 'AcquireTime',
+    'threshold_apply': pil3_prefix + 'ThresholdApply',
+    'status_message': pil3_prefix + 'StatusMessage_RBV',
+}
+
+pil3_values = {
+    'trigger_external_enable': 1,
+    'trigger_internal': 0,
+    'status_message_ok': 'OK',
 }

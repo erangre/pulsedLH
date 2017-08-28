@@ -35,6 +35,8 @@ class MainWidget(QtWidgets.QWidget):
         self.laser_us_emission_status = QtWidgets.QLabel()
         self.pimax_status_lbl = QtWidgets.QLabel('Pimax Mode:')
         self.pimax_status = QtWidgets.QLabel()
+        self.pil3_status_lbl = QtWidgets.QLabel('Pilatus Mode:')
+        self.pil3_status = QtWidgets.QLabel()
 
         self._component_status_layout.addWidget(self.laser_ds_emission_status_lbl, 0, 0)
         self._component_status_layout.addWidget(self.laser_ds_emission_status, 0, 1)
@@ -46,6 +48,8 @@ class MainWidget(QtWidgets.QWidget):
         self._component_status_layout.addWidget(self.laser_us_status, 1, 3)
         self._component_status_layout.addWidget(self.pimax_status_lbl, 2, 0)
         self._component_status_layout.addWidget(self.pimax_status, 2, 1)
+        self._component_status_layout.addWidget(self.pil3_status_lbl, 2, 2)
+        self._component_status_layout.addWidget(self.pil3_status, 2, 3)
 
         self._status_layout.addWidget(self.main_status)
         self._status_layout.addWidget(self.main_mode_status)
@@ -79,6 +83,8 @@ class MainWidget(QtWidgets.QWidget):
         self.laser_ds_status_lbl.setStyleSheet("font: 18px; color: black;")
         self.laser_us_status_lbl.setStyleSheet("font: 18px; color: black;")
         self.pimax_status_lbl.setStyleSheet("font: 18px; color: black;")
+        self.pil3_status_lbl.setStyleSheet("font: 18px; color: black;")
+
         self.pulsed_laser_heating_btn.setCheckable(True)
         self.mode_switch_btn.setCheckable(True)
         self.configuration_btn.setCheckable(True)
@@ -89,12 +95,12 @@ class MainWidget(QtWidgets.QWidget):
 
     def fix_sizes(self):
         # TODO - find a better way to control size of app when changing tabs
-        tab_rect = QtCore.QRect(11, 139, 477, 23)
-        main_rect = QtCore.QRect(11, 159, 477, 120)
-        outer_rect = QtCore.QRect(0, 0, 499, 316)
+        # tab_rect = QtCore.QRect(11, 139, 477, 23)
+        # main_rect = QtCore.QRect(11, 159, 477, 120)
+        # outer_rect = QtCore.QRect(0, 0, 499, 316)
         # widget_rect = QtCore.QRect(640, 340, 499, 442)
-        self._tab_layout.setGeometry(tab_rect)
-        self._main_layout.setGeometry(main_rect)
-        self._outer_layout.setGeometry(outer_rect)
+        # self._tab_layout.setGeometry(tab_rect)
+        # self._main_layout.setGeometry(main_rect)
+        # self._outer_layout.setGeometry(outer_rect)
         self.setMaximumHeight(550)
         self.setMinimumHeight(550)

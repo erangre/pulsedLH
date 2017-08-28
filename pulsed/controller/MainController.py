@@ -9,7 +9,7 @@ from epics import caget, caput, PV
 from ..widgets.MainWidget import MainWidget
 from .ModeSwitchController import ModeSwitchController
 from .PulsedHeatingController import PulsedHeatingController
-from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values
+from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values
 
 MAIN_STATUS_OFF = 'Stopped'
 MAIN_STATUS_ON = 'Running'
@@ -22,6 +22,8 @@ LASER_EMISSION_ON = 'On'
 MODE_PULSED = 'Pulsed Mode'
 MODE_NORMAL = 'CW Mode'
 MODE_MIXED = 'Warning: Mixed Mode!'
+PIL3_STATUS_PULSED = 'Pulsed'
+PIL3_STATUS_NORMAL = 'Normal'
 
 
 class MainController(object):
@@ -33,6 +35,7 @@ class MainController(object):
         self.use_settings = use_settings
         self.callbacks = {}
         self.widget = MainWidget()
+        self.num_of_pulsed_status_pvs = 0
 
         # create data
         if settings_directory == 'default':
@@ -47,9 +50,10 @@ class MainController(object):
         self.update_main_status()
         self.update_laser_status()
         self.update_pimax_status()
-        self.update_main_mode_status()
+        self.update_pil3_status()
         self.prepare_connections()
         self.create_monitors()
+        self.update_main_mode_status()
 
         # if use_settings:
         #     self.load_default_settings()
@@ -78,6 +82,7 @@ class MainController(object):
         self.callbacks[lf_PVs['lf_get_experiment']] = self.update_pimax_status
         self.callbacks[laser_PVs['ds_laser_percent']] = self.pulsed_heating_controller.ds_laser_percent_changed
         self.callbacks[laser_PVs['us_laser_percent']] = self.pulsed_heating_controller.us_laser_percent_changed
+        self.callbacks[pil3_PVs['trigger_mode']] = self.update_pil3_status
 
     def update_main_status(self, value=None, char_value=None):
         if value is None:
@@ -97,8 +102,10 @@ class MainController(object):
             count_pulsed += 1
         if self.widget.pimax_status.text() == PIMAX_STATUS_PULSED:
             count_pulsed += 1
+        if self.widget.pil3_status.text() == PIL3_STATUS_PULSED:
+            count_pulsed += 1
 
-        if count_pulsed == 3:
+        if count_pulsed == self.num_of_pulsed_status_pvs:
             self.widget.main_mode_status.setText(MODE_PULSED)
             self.widget.main_mode_status.setStyleSheet("font: bold 24px; color: blue;")
         elif count_pulsed == 0:
@@ -175,6 +182,17 @@ class MainController(object):
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
         self.update_main_mode_status()
 
+    def update_pil3_status(self, value=None, char_value=None):
+        if value is None:
+            value = caget(pil3_PVs['trigger_mode'])
+        if char_value == pil3_values['trigger_external_enable']:
+            self.widget.pil3_status.setText(PIL3_STATUS_PULSED)
+            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: blue;")
+        else:
+            self.widget.pil3_status.setText(PIL3_STATUS_NORMAL)
+            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
+        self.update_main_mode_status()
+
     def switch_tabs(self):
         if self.widget.pulsed_laser_heating_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(True)
@@ -198,8 +216,20 @@ class MainController(object):
         self.pv_us_laser_modulation = PV(laser_PVs['us_modulation_status'])
         self.pv_us_laser_modulation.add_callback(self.pv_changed_value)
 
+        if self.pv_ds_laser_modulation.connected:
+            self.num_of_pulsed_status_pvs += 1
+        if self.pv_us_laser_modulation.connected:
+            self.num_of_pulsed_status_pvs += 1
+
         self.pv_pimax_experiment = PV(lf_PVs['lf_get_experiment'])
         self.pv_pimax_experiment.add_callback(self.pv_changed_value)
+        if self.pv_pimax_experiment.connected:
+            self.num_of_pulsed_status_pvs += 1
+
+        self.pv_pil3_trigger_mode = PV(pil3_PVs['trigger_mode'])
+        self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
+        if self.pv_pil3_trigger_mode.connected:
+            self.num_of_pulsed_status_pvs += 1
 
         self.pv_ds_laser_percent = PV(laser_PVs['ds_laser_percent'])
         self.pv_ds_laser_percent.add_callback(self.pv_changed_value)

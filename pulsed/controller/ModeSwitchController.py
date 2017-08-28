@@ -7,8 +7,9 @@ from qtpy import QtWidgets, QtCore
 from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
-from .utils import caput_lf
-from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values
+from .utils import caput_lf, caput_pil3
+from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values, \
+    general_PVs, general_values
 
 
 class ModeSwitchController(object):
@@ -18,6 +19,7 @@ class ModeSwitchController(object):
         :type widget: MainWidget
         """
         self.widget = widget
+        self.old_settings = {}
         self.prepare_connections()
         self.update_laser_btns_state()
         self.update_pimax_btns_state()
@@ -29,6 +31,8 @@ class ModeSwitchController(object):
         self.widget.mode_switch_widget.us_laser_normal_btn.clicked.connect(self.us_laser_normal_btn_clicked)
         self.widget.mode_switch_widget.pimax_to_pulsed_btn.clicked.connect(self.pimax_to_pulsed_btn_clicked)
         self.widget.mode_switch_widget.pimax_to_normal_btn.clicked.connect(self.pimax_to_normal_btn_clicked)
+        self.widget.mode_switch_widget.pil3_to_pulsed_btn.clicked.connect(self.pil3_to_pulsed_btn_clicked)
+        self.widget.mode_switch_widget.pil3_to_normal_btn.clicked.connect(self.pil3_to_normal_btn_clicked)
         self.widget.mode_switch_widget.all_to_pulsed_btn.clicked.connect(self.all_to_pulsed_btn_clicked)
         self.widget.mode_switch_widget.all_to_normal_btn.clicked.connect(self.all_to_normal_btn_clicked)
 
@@ -54,7 +58,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_enabled']:
                 return
-            # TODO Add here error message that DS laser cannot be changed to pulsed
+            # TODO Add here error message that US laser cannot be changed to pulsed
 
     def us_laser_normal_btn_clicked(self):
         t0 = time.time()
@@ -62,7 +66,7 @@ class ModeSwitchController(object):
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
                 return
-            # TODO Add here error message that DS laser cannot be changed to normal
+            # TODO Add here error message that US laser cannot be changed to normal
 
     def update_laser_btns_state(self):
         if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_enabled']:
@@ -77,8 +81,10 @@ class ModeSwitchController(object):
 
     def pimax_to_pulsed_btn_clicked(self):
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
+        caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
 
     def pimax_to_normal_btn_clicked(self):
+        caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_normal'], wait=True)
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_normal'], wait=True)
 
     def update_pimax_btns_state(self):
@@ -87,16 +93,45 @@ class ModeSwitchController(object):
         elif caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:
             self.widget.mode_switch_widget.pimax_to_pulsed_btn.setChecked(True)
 
+    def pil3_to_pulsed_btn_clicked(self):
+        self.old_settings['pilatus_exposure_time'] = caget(pil3_PVs['exposure_time'])
+        caput_pil3(pil3_PVs['trigger_mode'], pil3_values['trigger_external_enable'])
+        caput_pil3(pil3_PVs['exposures_per_image'], 100000)  # TODO - read this from the config tab
+        caput_pil3(pil3_PVs['exposure_time'], 1E-6)  # TODO - read this from config tab
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(general_PVs['pilatus_gate_control'], general_values['pilatus_gate_control_BNC'])
+
+    def pil3_to_normal_btn_clicked(self):
+        caput_pil3(pil3_PVs['trigger_mode'], pil3_values['trigger_internal'])
+        caput_pil3(pil3_PVs['exposures_per_image'], 1)
+        caput_pil3(pil3_PVs['exposure_time'], self.old_settings.get('pilatus_exposure_time', 1.0))
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
+        caput_pil3(general_PVs['pilatus_gate_control'], general_values['pilatus_gate_control_XPS'])
+
+    def update_pil3_btns_state(self):
+        if caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_internal']:
+            self.widget.mode_switch_widget.pimax_to_normal_btn.setChecked(True)
+        elif caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_external_enable']:
+            self.widget.mode_switch_widget.pimax_to_pulsed_btn.setChecked(True)
+
     def all_to_normal_btn_clicked(self):
         self.ds_laser_normal_btn_clicked()
         self.us_laser_normal_btn_clicked()
         self.pimax_to_normal_btn_clicked()
+        self.pil3_to_normal_btn_clicked()
         self.update_laser_btns_state()
         self.update_pimax_btns_state()
+        self.update_pil3_btns_state()
 
     def all_to_pulsed_btn_clicked(self):
         self.ds_laser_pulsed_btn_clicked()
         self.us_laser_pulsed_btn_clicked()
         self.pimax_to_pulsed_btn_clicked()
+        self.pil3_to_pulsed_btn_clicked()
         self.update_laser_btns_state()
         self.update_pimax_btns_state()
+        self.update_pil3_btns_state()
