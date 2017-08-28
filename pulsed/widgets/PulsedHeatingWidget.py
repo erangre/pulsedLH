@@ -2,9 +2,9 @@
 from qtpy import QtWidgets, QtGui, QtCore
 
 
-class PulsedLaserHeatingWidget(QtWidgets.QGroupBox):
+class PulsedHeatingWidget(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):
-        super(PulsedLaserHeatingWidget, self).__init__(*args, **kwargs)
+        super(PulsedHeatingWidget, self).__init__(*args, **kwargs)
 
         self.ten_percent_btn = QtWidgets.QPushButton('10%')
         self.zero_btn = QtWidgets.QPushButton('Zero')
@@ -20,6 +20,8 @@ class PulsedLaserHeatingWidget(QtWidgets.QGroupBox):
         self.start_timing_btn = QtWidgets.QPushButton('Adjustment')
         self.measure_temperature_cb = QtWidgets.QCheckBox('measure T?')
         self.measure_diffraction_cb = QtWidgets.QCheckBox('measure XRD?')
+        self.ds_enable_pulses_cb = QtWidgets.QCheckBox('Enable?')
+        self.us_enable_pulses_cb = QtWidgets.QCheckBox('Enable?')
         self.ds_lbl = QtWidgets.QLabel('down-stream')
         self.us_lbl = QtWidgets.QLabel('up-stream')
         self.ds_percent_display_le = QtWidgets.QLineEdit('0.0')
@@ -45,9 +47,11 @@ class PulsedLaserHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.ten_percent_btn, 1, 0)
         self._grid_layout.addWidget(self.both_increase_percent_btn, 2, 3)
         self._grid_layout.addWidget(self.zero_btn, 1, 6)
-        self._grid_layout.addWidget(self.ds_lbl, 3, 0, 1, 2)
+        self._grid_layout.addWidget(self.ds_enable_pulses_cb, 3, 0, 1, 1)
+        self._grid_layout.addWidget(self.ds_lbl, 3, 1, 1, 1)
         self._grid_layout.addWidget(self.laser_percent_tweak_le, 3, 2, 1, 3)
-        self._grid_layout.addWidget(self.us_lbl, 3, 5, 1, 2)
+        self._grid_layout.addWidget(self.us_lbl, 3, 5, 1, 1)
+        self._grid_layout.addWidget(self.us_enable_pulses_cb, 3, 6, 1, 1)
         self._grid_layout.addWidget(self.ds_decrease_percent_btn, 4, 0)
         self._grid_layout.addWidget(self.ds_increase_percent_btn, 4, 1)
         self._grid_layout.addWidget(self.both_decrease_percent_btn, 4, 3)
@@ -63,7 +67,6 @@ class PulsedLaserHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.delay_lbl, 7, 2, 1, 3)
         self._grid_layout.addWidget(self.us_delay_le, 7, 5, 1, 2)
 
-
         self.setLayout(self._layout)
 
         self.style_widgets()
@@ -71,6 +74,8 @@ class PulsedLaserHeatingWidget(QtWidgets.QGroupBox):
     def style_widgets(self):
         self.stop_pulse_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.stop_pulse_btn.setStyleSheet("font: bold 16px; black;")
+        self.ds_enable_pulses_cb.setChecked(True)
+        self.us_enable_pulses_cb.setChecked(True)
         self.laser_percent_tweak_le.setValidator(QtGui.QDoubleValidator())
         self.ds_lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.us_lbl.setAlignment(QtCore.Qt.AlignCenter)

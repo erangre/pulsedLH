@@ -10,6 +10,9 @@ pulse_PVs = {
     'BNC_T1_delay': bnc_prefix + 'P1:Delay',
     'BNC_T2_delay': bnc_prefix + 'P2:Delay',
     'BNC_T4_delay': bnc_prefix + 'P4:Delay',
+    'BNC_T1_enable': bnc_prefix + 'P1:State',
+    'BNC_T2_enable': bnc_prefix + 'P2:State',
+    'BNC_T$_enable': bnc_prefix + 'P4:State',
 }
 
 pulse_values = {
@@ -17,6 +20,8 @@ pulse_values = {
     'BNC_STOPPED': 0,
     'BNC_BURST': 2,
     'BNC_NORMAL': 0,
+    'BNC_ENABLE': 1,
+    'BNC_DISABLE': 0,
 }
 
 general_PVs = {

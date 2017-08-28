@@ -31,6 +31,8 @@ class PulsedHeatingController(QtCore.QObject):
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
         self.widget.zero_btn.clicked.connect(self.zero_btn_clicked)
+        self.widget.ds_enable_pulses_cb.stateChanged.connect(self.ds_enable_pulses_cb_changed)
+        self.widget.us_enable_pulses_cb.stateChanged.connect(self.us_enable_pulses_cb_changed)
         self.widget.laser_percent_tweak_le.editingFinished.connect(self.laser_percent_tweak_le_editing_finished)
         self.widget.ds_increase_percent_btn.clicked.connect(self.ds_increase_percent_btn_clicked)
         self.widget.ds_decrease_percent_btn.clicked.connect(self.ds_decrease_percent_btn_clicked)
@@ -53,6 +55,18 @@ class PulsedHeatingController(QtCore.QObject):
         caput(laser_PVs['ds_laser_percent'], 0.0, wait=True)
         caput(laser_PVs['us_laser_percent'], 0.0, wait=True)
         self.pulse_changed.emit()
+
+    def ds_enable_pulses_cb_changed(self):
+        if self.widget.ds_enable_pulses_cb.isChecked():
+            caput(pulse_PVs['BNC_T1_enable'], pulse_values['BNC_ENABLE'])
+        else:
+            caput(pulse_PVs['BNC_T1_enable'], pulse_values['BNC_DISABLE'])
+
+    def us_enable_pulses_cb_changed(self):
+        if self.widget.us_enable_pulses_cb.isChecked():
+            caput(pulse_PVs['BNC_T2_enable'], pulse_values['BNC_ENABLE'])
+        else:
+            caput(pulse_PVs['BNC_T2_enable'], pulse_values['BNC_DISABLE'])
 
     def laser_percent_tweak_le_editing_finished(self):
         caput(laser_PVs['ds_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)

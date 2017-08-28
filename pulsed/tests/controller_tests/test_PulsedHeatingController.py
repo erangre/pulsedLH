@@ -165,3 +165,24 @@ class PulsedHeatingControllerTest(QtTest):
         enter_value_into_text_field(self.widget.laser_percent_tweak_le, str(step_value))
         self.widget.both_increase_percent_btn.click()
         self.assertAlmostEqual(float(self.widget.ds_percent_display_le.text()), step_value, places=2)
+
+    def test_disable_and_enable_pulses_for_each_laser(self):
+        self.assertEqual(caget(pulse_PVs['BNC_T1_enable']), pulse_values['BNC_ENABLE'])
+        self.widget.ds_enable_pulses_cb.setChecked(False)
+        time.sleep(0.1)
+
+        self.assertEqual(caget(pulse_PVs['BNC_T1_enable']), pulse_values['BNC_DISABLE'])
+        self.widget.ds_enable_pulses_cb.setChecked(True)
+        time.sleep(0.1)
+        self.assertEqual(caget(pulse_PVs['BNC_T1_enable']), pulse_values['BNC_ENABLE'])
+
+        self.assertEqual(caget(pulse_PVs['BNC_T2_enable']), pulse_values['BNC_ENABLE'])
+        self.widget.us_enable_pulses_cb.setChecked(False)
+        time.sleep(0.1)
+        self.assertEqual(caget(pulse_PVs['BNC_T2_enable']), pulse_values['BNC_DISABLE'])
+
+        self.widget.us_enable_pulses_cb.setChecked(True)
+        time.sleep(0.1)
+        self.assertEqual(caget(pulse_PVs['BNC_T2_enable']), pulse_values['BNC_ENABLE'])
+
+    # TODO - Add controls for manual relative delays (between T1 and T2 , and for T4
