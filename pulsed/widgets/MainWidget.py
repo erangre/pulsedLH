@@ -96,5 +96,5 @@ class MainWidget(QtWidgets.QWidget):
         self._tab_layout.setGeometry(tab_rect)
         self._main_layout.setGeometry(main_rect)
         self._outer_layout.setGeometry(outer_rect)
-        self.setMaximumHeight(450)
-        self.setMinimumHeight(450)
+        self.setMaximumHeight(550)
+        self.setMinimumHeight(550)

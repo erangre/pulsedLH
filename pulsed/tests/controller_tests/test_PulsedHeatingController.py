@@ -185,4 +185,36 @@ class PulsedHeatingControllerTest(QtTest):
         time.sleep(0.1)
         self.assertEqual(caget(pulse_PVs['BNC_T2_enable']), pulse_values['BNC_ENABLE'])
 
-    # TODO - Add controls for manual relative delays (between T1 and T2 , and for T4
+    def test_manual_delay_between_ds_and_us(self):
+        self.assertAlmostEqual(self.widget.ds_us_manual_delay_sb.value(), 0, places=3)
+        old_t1_delay = caget(pulse_PVs['BNC_T1_delay']) * 1E6
+        self.widget.manual_delay_step_size_1_btn.click()
+        self.widget.ds_us_manual_delay_sb.stepUp()
+        self.assertAlmostEqual(self.widget.ds_us_manual_delay_sb.value(), 1, places=3)
+        self.assertAlmostEqual(float(self.widget.ds_delay_le.text()), old_t1_delay + 1, places=2)
+        self.widget.ds_us_manual_delay_sb.stepDown()
+        self.assertAlmostEqual(float(self.widget.ds_delay_le.text()), old_t1_delay, places=2)
+
+    def test_manual_gate_delay(self):
+        self.assertAlmostEqual(self.widget.gate_manual_delay_sb.value(), 0, places=3)
+        old_t4_delay = caget(pulse_PVs['BNC_T4_delay']) * 1E6
+        self.widget.manual_delay_step_size_1_btn.click()
+        self.widget.gate_manual_delay_sb.stepUp()
+        self.assertAlmostEqual(self.widget.gate_manual_delay_sb.value(), 1, places=3)
+        self.assertAlmostEqual(caget(pulse_PVs['BNC_T4_delay']) * 1E6, old_t4_delay + 1, places=2)
+        self.widget.gate_manual_delay_sb.stepDown()
+        self.assertAlmostEqual(caget(pulse_PVs['BNC_T4_delay']) * 1E6, old_t4_delay, places=2)
+
+    def test_manual_delay_step_size(self):
+        self.widget.manual_delay_step_size_0p001_btn.click()
+        self.assertEqual(self.widget.gate_manual_delay_sb.singleStep(), 0.001)
+        self.assertEqual(self.widget.ds_us_manual_delay_sb.singleStep(), 0.001)
+        self.widget.manual_delay_step_size_0p01_btn.click()
+        self.assertEqual(self.widget.gate_manual_delay_sb.singleStep(), 0.01)
+        self.assertEqual(self.widget.ds_us_manual_delay_sb.singleStep(), 0.01)
+        self.widget.manual_delay_step_size_0p1_btn.click()
+        self.assertEqual(self.widget.gate_manual_delay_sb.singleStep(), 0.1)
+        self.assertEqual(self.widget.ds_us_manual_delay_sb.singleStep(), 0.1)
+        self.widget.manual_delay_step_size_1_btn.click()
+        self.assertEqual(self.widget.gate_manual_delay_sb.singleStep(), 1.0)
+        self.assertEqual(self.widget.ds_us_manual_delay_sb.singleStep(), 1.0)

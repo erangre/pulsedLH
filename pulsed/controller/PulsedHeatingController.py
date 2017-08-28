@@ -3,6 +3,7 @@ import os
 import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
+from functools import partial
 
 from epics import caget, caput
 
@@ -27,6 +28,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.model = WidthDelayModel()
         self.prepare_connections()
         self.laser_percent_tweak_le_editing_finished()
+        self.manual_delay = 1.0
 
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
@@ -43,6 +45,10 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.start_pulse_btn.clicked.connect(self.start_pulse_btn_clicked)
         self.widget.stop_pulse_btn.clicked.connect(self.stop_pulse_btn_clicked)
         self.widget.start_timing_btn.clicked.connect(self.start_timing_btn_clicked)
+        self.widget.ds_us_manual_delay_sb.valueChanged.connect(self.ds_us_manual_delay_changed)
+        self.widget.gate_manual_delay_sb.valueChanged.connect(self.gate_manual_delay_changed)
+        for manual_delay_step_btn in self.widget.manual_delay_step_btns:
+            manual_delay_step_btn.clicked.connect(partial(self.manual_delay_step_btn_clicked, manual_delay_step_btn))
 
         self.pulse_changed.connect(self.update_bnc_timings)
 
@@ -123,13 +129,16 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
 
     def update_bnc_timings(self):
-        self.toggle_percent_btns(False)
+        self.toggle_percent_and_timing_btns(False)
         QtWidgets.QApplication.processEvents()
         f = 1.0/caget(pulse_PVs['BNC_period'])
         w = 1.0  # TODO change this to read from settings the pulse width
         ds_percent = caget(laser_PVs['ds_laser_percent'], as_string=False)
         us_percent = caget(laser_PVs['us_laser_percent'], as_string=False)
-        timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent)
+        ds_us_manual_delay = self.widget.ds_us_manual_delay_sb.value()
+        gate_manual_delay = self.widget.gate_manual_delay_sb.value()
+        timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent, ds_us_manual_delay,
+                                                        gate_manual_delay)
         caput(pulse_PVs['BNC_T1_delay'], timings['delay_t1'], wait=True)
         caput(pulse_PVs['BNC_T2_delay'], timings['delay_t2'], wait=True)
         caput(pulse_PVs['BNC_T4_delay'], timings['delay_t4'], wait=True)
@@ -137,7 +146,7 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_T2_width'], timings['width_t2'], wait=True)
         caput(pulse_PVs['BNC_T4_width'], timings['width_t4'], wait=True)
         self.widget.update_timing_labels(timings)
-        self.toggle_percent_btns(True)
+        self.toggle_percent_and_timing_btns(True)
 
     def ds_laser_percent_changed(self, value=None, char_value=None):
         self.widget.ds_percent_display_le.setText(str(round(value, 2)))
@@ -145,10 +154,28 @@ class PulsedHeatingController(QtCore.QObject):
     def us_laser_percent_changed(self, value=None, char_value=None):
         self.widget.us_percent_display_le.setText(str(round(value, 2)))
 
-    def toggle_percent_btns(self, toggle):
+    def toggle_percent_and_timing_btns(self, toggle):
         self.widget.both_increase_percent_btn.setEnabled(toggle)
         self.widget.both_decrease_percent_btn.setEnabled(toggle)
         self.widget.ds_increase_percent_btn.setEnabled(toggle)
         self.widget.ds_decrease_percent_btn.setEnabled(toggle)
         self.widget.us_increase_percent_btn.setEnabled(toggle)
         self.widget.us_decrease_percent_btn.setEnabled(toggle)
+        self.widget.ds_us_manual_delay_sb.setEnabled(toggle)
+        self.widget.gate_manual_delay_sb.setEnabled(toggle)
+
+    def ds_us_manual_delay_changed(self):
+        self.update_bnc_timings()
+
+    def gate_manual_delay_changed(self):
+        self.update_bnc_timings()
+
+    def manual_delay_step_btn_clicked(self, manual_delay_step_btn):
+        """
+        :param manual_delay_step_btn:
+        :type manual_delay_step_btn QtWidgets.QPushButton
+        :return: 
+        """
+        manual_delay_step_btn.setChecked(True)
+        self.widget.ds_us_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
+        self.widget.gate_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
