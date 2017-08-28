@@ -4,7 +4,10 @@ import time
 
 
 def caput_lf(pv, value, wait=True):
+    if not caget(lf_PVs['lf_detector_state'], as_string=True) == lf_values['lf_detector_idle']:
+        return False
     t0 = time.time()
+
     caput(pv, value, wait=wait)
 
     while time.time() - t0 < 20.0:

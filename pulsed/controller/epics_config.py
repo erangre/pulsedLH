@@ -79,7 +79,7 @@ lf_values = {
     'lf_Acquiring': 1,
 }
 
-pil3_prefix = '13PIL3:came:'
+pil3_prefix = '13PIL3:cam1:'
 
 pil3_PVs = {
     'trigger_mode': pil3_prefix + 'TriggerMode',
@@ -87,6 +87,7 @@ pil3_PVs = {
     'exposure_time': pil3_prefix + 'AcquireTime',
     'threshold_apply': pil3_prefix + 'ThresholdApply',
     'status_message': pil3_prefix + 'StatusMessage_RBV',
+    'Acquire': pil3_prefix + 'Acquire',
 }
 
 pil3_values = {

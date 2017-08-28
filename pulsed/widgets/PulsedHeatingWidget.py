@@ -90,6 +90,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.manual_delay_step_size_0p001_btn, 8, 5, 1, 1)
         self._grid_layout.addWidget(self.gate_manual_delay_lbl, 8, 6, 1, 1)
         self._grid_layout.addWidget(self.gate_manual_delay_sb, 8, 7, 1, 1)
+        self._grid_layout.addWidget(self.measure_temperature_cb, 9, 0, 1, 1)
+        self._grid_layout.addWidget(self.measure_diffraction_cb, 9, 1, 1, 1)
 
         self.setLayout(self._layout)
 
@@ -122,11 +124,17 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.width_lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.ds_us_manual_delay_sb.setSingleStep(1.0)
         self.ds_us_manual_delay_sb.setValue(0.0)
+        self.ds_us_manual_delay_sb.setRange(-999, 999)
+        self.ds_us_manual_delay_sb.setDecimals(3)
         self.gate_manual_delay_sb.setSingleStep(1.0)
         self.gate_manual_delay_sb.setValue(0.0)
+        self.gate_manual_delay_sb.setRange(-999, 999)
+        self.gate_manual_delay_sb.setDecimals(3)
+        self.measure_temperature_cb.setChecked(True)
+        self.measure_diffraction_cb.setChecked(True)
 
     def update_timing_labels(self, timings):
-        self.ds_delay_le.setText(str(round(timings['delay_t1'] * 1E6, 2)))
-        self.us_delay_le.setText(str(round(timings['delay_t2'] * 1E6, 2)))
-        self.ds_width_le.setText(str(round(timings['width_t1'] * 1E6, 2)))
-        self.us_width_le.setText(str(round(timings['width_t2'] * 1E6, 2)))
+        self.ds_delay_le.setText(str(round(timings['delay_t1'] * 1E6, 3)))
+        self.us_delay_le.setText(str(round(timings['delay_t2'] * 1E6, 3)))
+        self.ds_width_le.setText(str(round(timings['width_t1'] * 1E6, 3)))
+        self.us_width_le.setText(str(round(timings['width_t2'] * 1E6, 3)))

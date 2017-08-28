@@ -11,7 +11,7 @@ from ..widgets.MainWidget import MainWidget
 from ..model.WidthDelayModel import WidthDelayModel
 from .utils import caput_lf
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, general_PVs, \
-    general_values
+    general_values, pil3_PVs, pil3_values
 
 
 class PulsedHeatingController(QtCore.QObject):
@@ -28,7 +28,10 @@ class PulsedHeatingController(QtCore.QObject):
         self.model = WidthDelayModel()
         self.prepare_connections()
         self.laser_percent_tweak_le_editing_finished()
+        self.ds_laser_percent_changed()
+        self.us_laser_percent_changed()
         self.manual_delay = 1.0
+        self.update_bnc_timings()
 
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
@@ -116,7 +119,9 @@ class PulsedHeatingController(QtCore.QObject):
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         if self.widget.measure_temperature_cb.isChecked():
-            caput(lf_PVs['lf_acquire'], 1, wait=True)
+            caput(lf_PVs['lf_acquire'], 1, wait=False)
+        if self.widget.measure_diffraction_cb.isChecked():
+            caput(pil3_PVs['Acquire'], 1, wait=False)
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
 
     def stop_pulse_btn_clicked(self):
@@ -149,9 +154,13 @@ class PulsedHeatingController(QtCore.QObject):
         self.toggle_percent_and_timing_btns(True)
 
     def ds_laser_percent_changed(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['ds_laser_percent'])
         self.widget.ds_percent_display_le.setText(str(round(value, 2)))
 
     def us_laser_percent_changed(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['us_laser_percent'])
         self.widget.us_percent_display_le.setText(str(round(value, 2)))
 
     def toggle_percent_and_timing_btns(self, toggle):
