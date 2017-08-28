@@ -29,6 +29,8 @@ class ModeSwitchController(object):
         self.widget.mode_switch_widget.us_laser_normal_btn.clicked.connect(self.us_laser_normal_btn_clicked)
         self.widget.mode_switch_widget.pimax_to_pulsed_btn.clicked.connect(self.pimax_to_pulsed_btn_clicked)
         self.widget.mode_switch_widget.pimax_to_normal_btn.clicked.connect(self.pimax_to_normal_btn_clicked)
+        self.widget.mode_switch_widget.all_to_pulsed_btn.clicked.connect(self.all_to_pulsed_btn_clicked)
+        self.widget.mode_switch_widget.all_to_normal_btn.clicked.connect(self.all_to_normal_btn_clicked)
 
     def ds_laser_pulsed_btn_clicked(self):
         t0 = time.time()
@@ -84,3 +86,17 @@ class ModeSwitchController(object):
             self.widget.mode_switch_widget.pimax_to_normal_btn.setChecked(True)
         elif caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:
             self.widget.mode_switch_widget.pimax_to_pulsed_btn.setChecked(True)
+
+    def all_to_normal_btn_clicked(self):
+        self.ds_laser_normal_btn_clicked()
+        self.us_laser_normal_btn_clicked()
+        self.pimax_to_normal_btn_clicked()
+        self.update_laser_btns_state()
+        self.update_pimax_btns_state()
+
+    def all_to_pulsed_btn_clicked(self):
+        self.ds_laser_pulsed_btn_clicked()
+        self.us_laser_pulsed_btn_clicked()
+        self.pimax_to_pulsed_btn_clicked()
+        self.update_laser_btns_state()
+        self.update_pimax_btns_state()
