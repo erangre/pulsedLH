@@ -13,6 +13,7 @@ pulse_PVs = {
     'BNC_T1_enable': bnc_prefix + 'P1:State',
     'BNC_T2_enable': bnc_prefix + 'P2:State',
     'BNC_T$_enable': bnc_prefix + 'P4:State',
+    'BNC_burst_count': bnc_prefix + 'BurstCount'
 }
 
 pulse_values = {
@@ -69,6 +70,10 @@ lf_PVs = {
     'lf_detector_state': '13IDDLF1:cam1:DetectorState_RBV',
     'lf_last_file_name': '13IDDLF1:cam1:LFFileName_RBV',
     'lf_acquire': '13IDDLF1:cam1:Acquire',
+    'lf_get_accs': '13IDDLF1:cam1:NumAccumulations_RBV',
+    'lf_set_accs': '13IDDLF1:cam1:NumAccumulations',
+    'lf_get_frames': '13IDDLF1:cam1:NumImages_RBV',
+    'lf_set_frames': '13IDDLF1:cam1:NumImages',
 }
 
 lf_values = {

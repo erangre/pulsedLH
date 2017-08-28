@@ -9,6 +9,7 @@ from epics import caget, caput, PV
 from ..widgets.MainWidget import MainWidget
 from .ModeSwitchController import ModeSwitchController
 from .PulsedHeatingController import PulsedHeatingController
+from .ConfigController import ConfigController
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values
 
 MAIN_STATUS_OFF = 'Stopped'
@@ -46,11 +47,13 @@ class MainController(object):
         # self.model = pulsed_lh_model()
         self.mode_switch_controller = ModeSwitchController(self.widget)
         self.pulsed_heating_controller = PulsedHeatingController(self.widget)
+        self.config_controller = ConfigController(self.widget)
 
         self.update_main_status()
         self.update_laser_status()
         self.update_pimax_status()
-        self.update_pil3_status()
+        # TODO - uncomment PIL3
+        # self.update_pil3_status()
         self.prepare_connections()
         self.create_monitors()
         self.update_main_mode_status()
@@ -73,6 +76,7 @@ class MainController(object):
     def prepare_connections(self):
         self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
         self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
+        self.widget.configuration_btn.clicked.connect(self.switch_tabs)
         # self.pv_changed.connect(self.pv_changed_emitted)
         self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
         self.callbacks[laser_PVs['ds_emission_status']] = self.update_ds_laser_emission_status
@@ -197,9 +201,15 @@ class MainController(object):
         if self.widget.pulsed_laser_heating_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(True)
             self.widget.mode_switch_widget.setVisible(False)
+            self.widget.config_widget.setVisible(False)
         elif self.widget.mode_switch_btn.isChecked():
             self.widget.pulsed_laser_heating_widget.setVisible(False)
             self.widget.mode_switch_widget.setVisible(True)
+            self.widget.config_widget.setVisible(False)
+        elif self.widget.configuration_btn.isChecked():
+            self.widget.pulsed_laser_heating_widget.setVisible(False)
+            self.widget.mode_switch_widget.setVisible(False)
+            self.widget.config_widget.setVisible(True)
         self.widget.fix_sizes()
 
     def create_monitors(self):
@@ -226,10 +236,10 @@ class MainController(object):
         if self.pv_pimax_experiment.connected:
             self.num_of_pulsed_status_pvs += 1
 
-        self.pv_pil3_trigger_mode = PV(pil3_PVs['trigger_mode'])
-        self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
-        if self.pv_pil3_trigger_mode.connected:
-            self.num_of_pulsed_status_pvs += 1
+        # self.pv_pil3_trigger_mode = PV(pil3_PVs['trigger_mode'])
+        # self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
+        # if self.pv_pil3_trigger_mode.connected:
+        #     self.num_of_pulsed_status_pvs += 1
 
         self.pv_ds_laser_percent = PV(laser_PVs['ds_laser_percent'])
         self.pv_ds_laser_percent.add_callback(self.pv_changed_value)

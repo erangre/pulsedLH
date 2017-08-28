@@ -1,8 +1,8 @@
 # -*- coding: utf8 -*-
 from qtpy import QtWidgets, QtGui, QtCore
 from .PulsedHeatingWidget import PulsedHeatingWidget
-from  .ModeSwitchWidget import ModeSwitchWidget
-
+from .ModeSwitchWidget import ModeSwitchWidget
+from .ConfigWidget import ConfigWidget
 
 class MainWidget(QtWidgets.QWidget):
     def __init__(self, *args, **kwargs):
@@ -69,10 +69,13 @@ class MainWidget(QtWidgets.QWidget):
 
         self.pulsed_laser_heating_widget = PulsedHeatingWidget()
         self.mode_switch_widget = ModeSwitchWidget()
+        self.config_widget = ConfigWidget()
         self._main_layout.addWidget(self.pulsed_laser_heating_widget)
         self._main_layout.addWidget(self.mode_switch_widget)
+        self._main_layout.addWidget(self.config_widget)
 
         self.mode_switch_widget.setVisible(False)
+        self.config_widget.setVisible(False)
 
         self.setLayout(self._outer_layout)
         self.style_widgets()
