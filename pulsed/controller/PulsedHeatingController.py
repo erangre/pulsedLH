@@ -10,7 +10,7 @@ from epics import caget, caput
 
 from ..widgets.MainWidget import MainWidget
 from ..model.WidthDelayModel import WidthDelayModel
-from .utils import caput_lf
+from .utils import caput_lf, caput_pil3
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, general_PVs, \
     general_values, pil3_PVs, pil3_values
 
@@ -339,4 +339,9 @@ class PulsedHeatingController(QtCore.QObject):
         caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_external'])
         caput_lf(lf_PVs['lf_set_image_mode'], lf_values['lf_image_mode_normal'])
         for item in previous_settings:
-            caput_lf(item, previous_settings[item], wait=True)
+            if item in lf_PVs:
+                caput_lf(item, previous_settings[item], wait=True)
+            elif item in pil3_PVs:
+                caput_pil3(item, previous_settings[item], wait=True)
+            else:
+                caput(item, previous_settings[item], wait=True)
