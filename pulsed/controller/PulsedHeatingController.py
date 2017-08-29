@@ -4,6 +4,7 @@ import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
 from functools import partial
+from threading import Thread
 
 from epics import caget, caput
 
@@ -25,6 +26,7 @@ class PulsedHeatingController(QtCore.QObject):
         """
         super(PulsedHeatingController, self).__init__()
         self.widget = widget.pulsed_laser_heating_widget
+        self.main_widget = widget
         self.model = WidthDelayModel()
         self.prepare_connections()
         self.laser_percent_tweak_le_editing_finished()
@@ -32,6 +34,11 @@ class PulsedHeatingController(QtCore.QObject):
         self.us_laser_percent_changed()
         self.manual_delay = 1.0
         self.update_bnc_timings()
+        self.log_info = {}
+        self.log_order = ['date_time', 'xrd_file_name', 'xrd_file_path', 't_file_name', 't_file_path', 'xrd_exp_time',
+                          't_exp_time_per_frame', 'num_t_frames', 'num_t_accumulations', 'num_pulses', 'ds_percent',
+                          'us_percent', 'pulse_width']
+        self.first_run = True
 
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
@@ -116,13 +123,37 @@ class PulsedHeatingController(QtCore.QObject):
         self.pulse_changed.emit()
 
     def start_pulse_btn_clicked(self):
+        self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
+        if self.first_run:
+            self.write_headings()
+            self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
+        self.collect_info_for_log()
         if self.widget.measure_temperature_cb.isChecked():
             caput(lf_PVs['lf_acquire'], 1, wait=False)
+            t_toggle = True
+        else:
+            t_toggle = False
         if self.widget.measure_diffraction_cb.isChecked():
             caput(pil3_PVs['Acquire'], 1, wait=False)
+            xrd_toggle = True
+        else:
+            xrd_toggle = False
+
+        bnc_run_thread = Thread(target=self.start_pulses_on_thread)
+        bnc_run_thread.start()
+
+        while bnc_run_thread.isAlive():
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+
+        self.collect_xrd_and_t_info_for_log(xrd=xrd_toggle, temperature=t_toggle)
+        self.write_to_log_file()
+
+    def start_pulses_on_thread(self):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
+        self.wait_until_pulses_end()
 
     def stop_pulse_btn_clicked(self):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
@@ -188,3 +219,59 @@ class PulsedHeatingController(QtCore.QObject):
         manual_delay_step_btn.setChecked(True)
         self.widget.ds_us_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
         self.widget.gate_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
+
+    def collect_info_for_log(self):
+        self.log_info['date_time'] = time.asctime().replace(' ', '_')
+        self.log_info['ds_percent'] = caget(laser_PVs['ds_laser_percent'])
+        self.log_info['us_percent'] = caget(laser_PVs['us_laser_percent'])
+        self.log_info['num_pulses'] = self.main_widget.config_widget.num_pulses_sb.value()
+        self.log_info['pulse_width'] = caget(pulse_PVs['BNC_T4_width'])
+        self.log_info['ds_delay'] = caget(pulse_PVs['BNC_T1_delay'])
+        self.log_info['us_delay'] = caget(pulse_PVs['BNC_T2_delay'])
+        self.log_info['gate_delay'] = caget(pulse_PVs['BNC_T4_delay'])
+        self.log_info['ds_width'] = caget(pulse_PVs['BNC_T1_delay'])
+        self.log_info['us_width'] = caget(pulse_PVs['BNC_T2_delay'])
+        self.log_info['num_t_frames'] = caget(lf_PVs['lf_get_frames'])
+        self.log_info['num_t_accumulations'] = caget(lf_PVs['lf_get_accs'])
+        self.log_info['t_exp_time_per_frame'] = self.log_info['pulse_width'] * self.log_info['num_t_accumulations']
+        # self.log_info['xrd_exp_time'] = self.log_info['pulse_width'] * caget(pil3_PVs['exposures_per_image'])
+
+        # TODO - uncomment pilatus parts
+
+    def collect_xrd_and_t_info_for_log(self, xrd=False, temperature=False):
+        if not xrd:
+            self.log_info['xrd_exp_time'] = 'N/A'
+            self.log_info['xrd_file_name'] = 'N/A'
+            self.log_info['xrd_file_path'] = 'N/A'
+        else:
+            (xrd_path, xrd_file) = os.path.split(caget(pil3_PVs['file_name'], as_string=True))
+            self.log_info['xrd_file_name'] = xrd_file
+            self.log_info['xrd_file_path'] = xrd_path
+
+        if not temperature:
+            self.log_info['num_t_frames'] = 'N/A'
+            self.log_info['num_t_accumulations'] = 'N/A'
+            self.log_info['t_exp_time_per_frame'] = 'N/A'
+            self.log_info['t_file_name'] = 'N/A'
+            self.log_info['t_file_path'] = 'N/A'
+        else:
+            (t_path, t_file) = os.path.split(caget(lf_PVs['lf_full_file_name'], as_string=True))
+            self.log_info['t_file_name'] = t_file
+            self.log_info['t_file_path'] = t_path
+
+    def write_to_log_file(self):
+        for item in self.log_order:
+            self.log_file.write(str(self.log_info[item]) + '\t')
+        self.log_file.write('\n')
+        self.log_file.flush()
+        self.log_file.close()
+
+    def write_headings(self):
+        for item in self.log_order:
+            self.log_file.write(item + '\t')
+        self.log_file.write('\n')
+        self.log_file.flush()
+
+    def wait_until_pulses_end(self):
+        while caget(pulse_PVs['BNC_run']) == pulse_values['BNC_RUNNING']:
+            time.sleep(0.1)

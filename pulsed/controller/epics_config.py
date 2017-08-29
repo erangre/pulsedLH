@@ -69,6 +69,7 @@ lf_PVs = {
     'lf_get_trigger_mode': '13IDDLF1:cam1:TriggerMode_RBV',
     'lf_detector_state': '13IDDLF1:cam1:DetectorState_RBV',
     'lf_last_file_name': '13IDDLF1:cam1:LFFileName_RBV',
+    'lf_full_file_name': '13IDDLF1:cam1:FullFileName_RBV',
     'lf_acquire': '13IDDLF1:cam1:Acquire',
     'lf_get_accs': '13IDDLF1:cam1:NumAccumulations_RBV',
     'lf_set_accs': '13IDDLF1:cam1:NumAccumulations',
@@ -93,6 +94,7 @@ pil3_PVs = {
     'threshold_apply': pil3_prefix + 'ThresholdApply',
     'status_message': pil3_prefix + 'StatusMessage_RBV',
     'Acquire': pil3_prefix + 'Acquire',
+    'file_name': '13PIL3:TIFF1:FullFileName_RBV',
 }
 
 pil3_values = {

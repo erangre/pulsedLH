@@ -1,6 +1,6 @@
 # -*- coding: utf8 -*-
 
-import os
+import os, sys
 import gc
 import time
 import shutil
@@ -19,8 +19,9 @@ from ...controller.MainController import MAIN_STATUS_OFF, MAIN_STATUS_ON, LASER_
 from ...controller.epics_config import pulse_PVs, general_PVs, pulse_values, general_values, laser_PVs, laser_values, \
     lf_PVs, lf_values
 from ...controller.utils import caput_lf
+from ... import excepthook
 
-unittest_data_path = os.path.join(os.path.dirname(__file__), '../data')
+data_path = os.path.normpath(os.path.join(os.path.dirname(__file__), '../data'))
 
 
 class PulsedHeatingControllerTest(QtTest):
@@ -218,3 +219,15 @@ class PulsedHeatingControllerTest(QtTest):
         self.widget.manual_delay_step_size_1_btn.click()
         self.assertEqual(self.widget.gate_manual_delay_sb.singleStep(), 1.0)
         self.assertEqual(self.widget.ds_us_manual_delay_sb.singleStep(), 1.0)
+
+    def test_running_creates_log_file(self):
+        # sys.excepthook = excepthook
+        log_file = os.path.join(data_path, 'test_log.txt')
+        os.remove(log_file)
+        self.assertFalse(os.path.isfile(log_file))
+        QtWidgets.QFileDialog.getSaveFileName = MagicMock(return_value=log_file)
+        self.main_controller.widget.config_widget.choose_log_path_btn.click()
+        self.widget.measure_temperature_cb.setChecked(True)
+        self.widget.measure_diffraction_cb.setChecked(False)
+        self.widget.start_pulse_btn.click()
+        self.assertTrue(os.path.isfile(log_file))

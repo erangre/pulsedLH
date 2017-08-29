@@ -97,6 +97,7 @@ class MainController(object):
         else:
             self.widget.main_status.setText(MAIN_STATUS_OFF)
             self.widget.main_status.setStyleSheet("font: bold 24px; color: black;")
+        QtWidgets.QApplication.processEvents()
 
     def update_main_mode_status(self):
         count_pulsed = 0
@@ -118,6 +119,7 @@ class MainController(object):
         else:
             self.widget.main_mode_status.setText(MODE_MIXED)
             self.widget.main_mode_status.setStyleSheet("font: bold 24px; color: red;")
+        QtWidgets.QApplication.processEvents()
 
     def update_ds_laser_emission_status(self, value=None, char_value=None):
         if value is None:
@@ -132,6 +134,7 @@ class MainController(object):
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: red;")
             self.widget.mode_switch_widget.ds_laser_normal_btn.setEnabled(False)
             self.widget.mode_switch_widget.ds_laser_pulsed_btn.setEnabled(False)
+        QtWidgets.QApplication.processEvents()
 
     def update_us_laser_emission_status(self, value=None, char_value=None):
         if value is None:
@@ -146,6 +149,7 @@ class MainController(object):
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: red;")
             self.widget.mode_switch_widget.us_laser_normal_btn.setEnabled(False)
             self.widget.mode_switch_widget.us_laser_pulsed_btn.setEnabled(False)
+        QtWidgets.QApplication.processEvents()
 
     def update_ds_laser_modulation_status(self, value=None, char_value=None):
         if value is None:
