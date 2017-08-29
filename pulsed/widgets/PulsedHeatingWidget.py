@@ -104,7 +104,7 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
 
     def style_widgets(self):
         self.stop_pulse_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.stop_pulse_btn.setStyleSheet("font: bold 16px; black;")
+        self.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black;")
         self.ds_enable_pulses_cb.setChecked(True)
         self.us_enable_pulses_cb.setChecked(True)
         self.laser_percent_tweak_le.setValidator(QtGui.QDoubleValidator())

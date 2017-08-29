@@ -130,6 +130,14 @@ class PulsedHeatingController(QtCore.QObject):
         self.pulse_changed.emit()
 
     def start_pulse_btn_clicked(self):
+        if caget(laser_PVs['ds_modulation_status']) == 0 or caget(laser_PVs['us_modulation_status']) == 0:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("One (or both) of the lasers are in CW mode.\nAre you sure you want to proceed?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            retval = msg.exec_()
+            if retval == QtWidgets.QMessageBox.No:
+                return
+
         if not self.timing_adjusted:
             msg = QtWidgets.QMessageBox()
             msg.setText("Laser timing was not adjusted to current laser power.\nAre you sure you want to proceed?")
@@ -165,10 +173,13 @@ class PulsedHeatingController(QtCore.QObject):
 
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
         bnc_run_thread.start()
+        self.widget.stop_pulse_btn.setStyleSheet("font: bold 16px; color: red;")
 
         while bnc_run_thread.isAlive():
             QtWidgets.QApplication.processEvents()
             time.sleep(0.1)
+
+        self.widget.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black;")
 
         self.collect_xrd_and_t_info_for_log(xrd=xrd_toggle, temperature=t_toggle)
         self.write_to_log_file()
@@ -192,10 +203,13 @@ class PulsedHeatingController(QtCore.QObject):
 
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
         bnc_run_thread.start()
+        self.widget.stop_pulse_btn.setStyleSheet("font: bold 16px; color: red;")
 
         while bnc_run_thread.isAlive():
             QtWidgets.QApplication.processEvents()
             time.sleep(0.1)
+
+        self.widget.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black;")
 
         caput_lf(pulse_PVs['BNC_burst_count'], old_num_pulses)
 
