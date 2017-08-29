@@ -51,7 +51,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.ds_us_manual_delay_sb = QtWidgets.QDoubleSpinBox()
         self.gate_manual_delay_sb = QtWidgets.QDoubleSpinBox()
 
-        self.collect_quenched_xrd_btn = QtWidgets.QPushButton()
+        self.collect_quenched_xrd_btn = QtWidgets.QPushButton('Collect quenched XRD')
+        self.measure_t_background_btn = QtWidgets.QPushButton('Measure T BG')
 
         self._layout = QtWidgets.QVBoxLayout()
         self._grid_layout = QtWidgets.QGridLayout()
@@ -94,6 +95,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.gate_manual_delay_sb, 8, 7, 1, 1)
         self._grid_layout.addWidget(self.measure_temperature_cb, 9, 0, 1, 1)
         self._grid_layout.addWidget(self.measure_diffraction_cb, 9, 1, 1, 1)
+        self._grid_layout.addWidget(self.collect_quenched_xrd_btn, 9, 2, 1, 2)
+        self._grid_layout.addWidget(self.measure_t_background_btn, 9, 4, 1, 2)
 
         self.setLayout(self._layout)
 

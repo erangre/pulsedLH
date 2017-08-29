@@ -58,9 +58,12 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.start_timing_btn.clicked.connect(self.start_timing_btn_clicked)
         self.widget.ds_us_manual_delay_sb.valueChanged.connect(self.ds_us_manual_delay_changed)
         self.widget.gate_manual_delay_sb.valueChanged.connect(self.gate_manual_delay_changed)
-        self.widget.collect_quenched_xrd_btn.clicked.connect(self.collect_quenched_xrd_btn_clicked)
+
         for manual_delay_step_btn in self.widget.manual_delay_step_btns:
             manual_delay_step_btn.clicked.connect(partial(self.manual_delay_step_btn_clicked, manual_delay_step_btn))
+
+        self.widget.collect_quenched_xrd_btn.clicked.connect(self.collect_quenched_xrd_btn_clicked)
+        self.widget.measure_t_background_btn.clicked.connect(self.measure_t_background_btn_clicked)
 
         self.pulse_changed.connect(self.update_bnc_timings)
 
@@ -311,3 +314,29 @@ class PulsedHeatingController(QtCore.QObject):
         self.collect_xrd_and_t_info_for_log(xrd=True, temperature=False)
         self.write_to_log_file()
 
+    def measure_t_background_btn_clicked(self):
+        lf_experiment = caget(lf_PVs['lf_get_experiment'], as_string=True)
+        if lf_experiment == lf_values['PIMAX_normal']:
+            return
+        elif lf_experiment == lf_values['PIMAX_pulsed']:
+            pass
+        else:
+            return
+
+        previous_settings = {}
+        previous_settings[lf_PVs['lf_set_frames']] = caget(lf_PVs['lf_get_frames'])
+        previous_settings[general_PVs['xrd_shutter_control']] = caget(general_PVs['xrd_shutter_status'])
+        previous_settings[general_PVs['ds_light_control']] = caget(general_PVs['ds_light_status'])
+        previous_settings[general_PVs['us_light_control']] = caget(general_PVs['us_light_status'])
+
+        caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_internal'])
+        caput_lf(lf_PVs['lf_set_internal_trigger_freq'], 1E4)
+        caput_lf(lf_PVs['lf_set_frames'], 1)
+        caput_lf(lf_PVs['lf_set_image_mode'], lf_values['lf_image_mode_background'])
+        caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_pulsed_bg_file_name'])
+        caput_lf(lf_PVs['lf_acquire'], 1, wait=True)
+        caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_external'])
+        caput_lf(lf_PVs['lf_set_image_mode'], lf_values['lf_image_mode_normal'])
+        for item in previous_settings:
+            caput_lf(item, previous_settings[item], wait=True)

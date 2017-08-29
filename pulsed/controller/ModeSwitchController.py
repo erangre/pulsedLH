@@ -103,7 +103,13 @@ class ModeSwitchController(object):
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_normal'], wait=True)
         caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_normal_bg_file_name'], wait=True)
 
-    def update_pimax_btns_state(self):
+    def update_pimax_btns_state(self, value=None):
+        if value is not None:
+            if value:
+                self.widget.mode_switch_widget.pimax_to_normal_btn.setChecked(True)
+            else:
+                self.widget.mode_switch_widget.pimax_to_pulsed_btn.setChecked(True)
+            return
         if caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_normal']:
             self.widget.mode_switch_widget.pimax_to_normal_btn.setChecked(True)
         elif caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_pulsed']:

@@ -190,11 +190,12 @@ class MainController(object):
         if char_value == lf_values['PIMAX_pulsed']:
             self.widget.pimax_status.setText(PIMAX_STATUS_PULSED)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: blue;")
+            self.mode_switch_controller.update_pimax_btns_state(False)
         else:
             self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
+            self.mode_switch_controller.update_pimax_btns_state(True)
         self.update_main_mode_status()
-        self.mode_switch_controller.update_pimax_btns_state()
 
     def update_pil3_status(self, value=None, char_value=None):
         if value is None:

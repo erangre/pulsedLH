@@ -27,8 +27,14 @@ pulse_values = {
 
 general_PVs = {
     'laser_shutter_status': '13IDD:Unidig2Bi4.VAL',
-    'laser_shutter_control': '13IDD:Unidig2Bo4.VAL',
+    'laser_shutter_control': '13IDD:Unidig2Bo4',
     'pilatus_gate_control': '13IDD:Unidig2Bo20',
+    'xrd_shutter_control': '13IDD:Unidig1Bo11',
+    'xrd_shutter_status': '13IDD:Unidig1Bi11.VAL',
+    'ds_light_control': '13IDD:Unidig1Bo22',
+    'ds_light_status': '13IDD:Unidig1Bi22.VAL',
+    'us_light_control': '13IDD:Unidig1Bo20',
+    'us_light_status': '13IDD:Unidig1Bi20.VAL',
 }
 
 general_values = {
@@ -36,6 +42,10 @@ general_values = {
     'laser_shutter_clear': 1,
     'pilatus_gate_control_BNC': 1,
     'pilatus_gate_control_XPS': 0,
+    'xrd_shutter_closed': 1,
+    'xrd_shutter_open': 0,
+    'light_off': 0,
+    'light_on': 1,
 }
 
 # TODO - maybe change to a prefix like for BNC
@@ -77,6 +87,9 @@ lf_PVs = {
     'lf_set_frames': '13IDDLF1:cam1:NumImages',
     'lf_get_bg_file_name': '13IDDLF1:cam1:LFBackgroundFile_RBV',
     'lf_set_bg_file_name':'13IDDLF1:cam1:LFBackgroundFile',
+    'lf_set_image_mode': '13IDDLF1:cam1:ImageMode',
+    'lf_get_image_mode': '13IDDLF1:cam1:ImageMode_RBV',
+    'lf_set_internal_trigger_freq': '13IDDLF1:cam1:LFTriggerFrequency',
 }
 
 lf_values = {
@@ -87,6 +100,10 @@ lf_values = {
     'lf_Acquiring': 1,
     'PIMAX_normal_bg_file_name': 'b_pimax',
     'PIMAX_pulsed_bg_file_name': 'b_pimax_pulsed',
+    'PIMAX_trigger_internal': 0,
+    'PIMAX_trigger_external': 1,
+    'lf_image_mode_normal': 0,
+    'lf_image_mode_background': 2,
 }
 
 pil3_prefix = '13PIL3:cam1:'
