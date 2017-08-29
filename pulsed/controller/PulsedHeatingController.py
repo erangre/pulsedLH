@@ -159,10 +159,20 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
 
     def start_timing_btn_clicked(self):
-        # TODO read the current num of pulses, change to X seconds for alignment, then change back to original num
+        old_num_pulses = caget(pulse_PVs['BNC_burst_count'])
+        temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
+        caput_lf(pulse_PVs['BNC_burst_count'], temp_num_pulses)
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
-        caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
+
+        bnc_run_thread = Thread(target=self.start_pulses_on_thread)
+        bnc_run_thread.start()
+
+        while bnc_run_thread.isAlive():
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+
+        caput_lf(pulse_PVs['BNC_burst_count'], old_num_pulses)
 
     def update_bnc_timings(self):
         self.toggle_percent_and_timing_btns(False)
