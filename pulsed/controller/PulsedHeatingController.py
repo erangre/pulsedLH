@@ -329,6 +329,10 @@ class PulsedHeatingController(QtCore.QObject):
         previous_settings[general_PVs['ds_light_control']] = caget(general_PVs['ds_light_status'])
         previous_settings[general_PVs['us_light_control']] = caget(general_PVs['us_light_status'])
 
+        caput(general_PVs['xrd_shutter_control'], general_values['xrd_shutter_closed'])
+        caput(general_PVs['ds_light_control'], general_values['light_off'])
+        caput(general_PVs['us_light_control'], general_values['light_off'])
+
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
         caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_internal'])
         caput_lf(lf_PVs['lf_set_internal_trigger_freq'], 1E4)
