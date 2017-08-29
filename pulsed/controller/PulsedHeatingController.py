@@ -36,6 +36,8 @@ class PulsedHeatingController(QtCore.QObject):
         self.manual_delay = 1.0
         self.update_bnc_timings()
         self.log_info = {}
+        self.bg_collected_for = None
+        self.timing_adjusted = False
         self.log_order = ['date_time', 'xrd_file_name', 'xrd_file_path', 't_file_name', 't_file_path', 'xrd_exp_time',
                           't_exp_time_per_frame', 'num_t_frames', 'num_t_accumulations', 'num_pulses', 'ds_percent',
                           'us_percent', 'pulse_width', 'shutter']
@@ -128,6 +130,14 @@ class PulsedHeatingController(QtCore.QObject):
         self.pulse_changed.emit()
 
     def start_pulse_btn_clicked(self):
+        if not self.timing_adjusted:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Laser timing was not adjusted to current laser power.\nAre you sure you want to proceed?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            retval = msg.exec_()
+            if retval == QtWidgets.QMessageBox.No:
+                return
+
         self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
         if self.first_run:
             self.write_headings()
@@ -136,6 +146,13 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         self.collect_info_for_log()
         if self.widget.measure_temperature_cb.isChecked():
+            if self.bg_collected_for is None or not caget(lf_PVs['lf_get_accs']) == self.bg_collected_for:
+                msg = QtWidgets.QMessageBox()
+                msg.setText("No BG collected for current T accumulations.\nAre you sure you want to proceed?")
+                msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+                retval = msg.exec_()
+                if retval == QtWidgets.QMessageBox.No:
+                    return
             caput(lf_PVs['lf_acquire'], 1, wait=False)
             t_toggle = True
         else:
@@ -166,6 +183,7 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
 
     def start_timing_btn_clicked(self):
+        self.timing_adjusted = True
         old_num_pulses = caget(pulse_PVs['BNC_burst_count'])
         temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
         caput_lf(pulse_PVs['BNC_burst_count'], temp_num_pulses)
@@ -182,6 +200,7 @@ class PulsedHeatingController(QtCore.QObject):
         caput_lf(pulse_PVs['BNC_burst_count'], old_num_pulses)
 
     def update_bnc_timings(self):
+        self.timing_adjusted = False
         self.toggle_percent_and_timing_btns(False)
         QtWidgets.QApplication.processEvents()
         f = 1.0/caget(pulse_PVs['BNC_period'])
@@ -223,9 +242,11 @@ class PulsedHeatingController(QtCore.QObject):
 
     def ds_us_manual_delay_changed(self):
         self.update_bnc_timings()
+        self.timing_adjusted = True
 
     def gate_manual_delay_changed(self):
         self.update_bnc_timings()
+        self.timing_adjusted = True
 
     def manual_delay_step_btn_clicked(self, manual_delay_step_btn):
         """
@@ -349,3 +370,4 @@ class PulsedHeatingController(QtCore.QObject):
                 caput_pil3(item, previous_settings[item], wait=True)
             else:
                 caput(item, previous_settings[item], wait=True)
+        self.bg_collected_for = caget(lf_PVs['lf_get_accs'])

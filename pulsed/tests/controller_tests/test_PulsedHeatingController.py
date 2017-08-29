@@ -245,3 +245,11 @@ class PulsedHeatingControllerTest(QtTest):
     def test_measure_t_background(self):
         self.widget.measure_t_background_btn.click()
         self.assertEqual(caget(lf_PVs['lf_last_file_name'], as_string=True), lf_values['PIMAX_pulsed_bg_file_name'])
+
+    def test_changing_t_values_demands_bg_collection(self):
+        self.assertIsNone(self.controller.bg_collected_for)
+        self.widget.measure_t_background_btn.click()
+        bg_num_accs = self.controller.bg_collected_for
+        self.assertTrue(bg_num_accs)
+        self.main_controller.widget.config_widget.pimax_max_num_accs_sb.setValue(20000)
+        self.assertNotEqual(caget(lf_PVs['lf_get_accs']), bg_num_accs)
