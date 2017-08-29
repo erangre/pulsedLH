@@ -70,11 +70,15 @@ class ConfigController(object):
         self.update_lf_settings(num_pulses)
 
     def update_lf_settings(self, num_pulses):
+        # self.toggle_config_btns(False)
+        # QtWidgets.QApplication.processEvents()
+        # problem with disabling widgets - currently edited spinbox loses focus.
         max_accs = self.widget.pimax_max_num_accs_sb.value()
         max_frames = self.widget.pimax_max_num_frames_sb.value()
         accs, frames = self.model.calc_frames_and_accs(num_pulses, max_accs, PIMAX_FACTOR, max_frames)
         caput_lf(lf_PVs['lf_set_accs'], accs)
         caput_lf(lf_PVs['lf_set_frames'], frames)
+        # self.toggle_config_btns(True)
 
     def choose_log_path_btn_clicked(self):
         CH_FILE_TEXT = 'Choose file for saving pulsed heating log'
@@ -83,3 +87,11 @@ class ConfigController(object):
         if isinstance(choose_file, tuple):
             choose_file = choose_file[0] + choose_file[1]
         self.widget.log_path_le.setText(choose_file)
+
+    def toggle_config_btns(self, toggle):
+        self.widget.num_pulses_sb.setEnabled(toggle)
+        self.widget.pimax_max_num_accs_sb.setEnabled(toggle)
+        self.widget.pimax_max_num_frames_sb.setEnabled(toggle)
+        self.widget.log_path_le.setEnabled(toggle)
+        self.widget.choose_log_path_btn.setEnabled(toggle)
+        QtWidgets.QApplication.processEvents()

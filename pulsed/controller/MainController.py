@@ -3,6 +3,7 @@ import os
 import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
+from functools import partial
 
 from epics import caget, caput, PV
 
@@ -77,6 +78,7 @@ class MainController(object):
         self.widget.mode_switch_btn.clicked.connect(self.switch_tabs)
         self.widget.pulsed_laser_heating_btn.clicked.connect(self.switch_tabs)
         self.widget.configuration_btn.clicked.connect(self.switch_tabs)
+        self.pulsed_heating_controller.pulse_running.connect(self.pulse_running_signal_emitted)
         # self.pv_changed.connect(self.pv_changed_emitted)
         self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
         self.callbacks[laser_PVs['ds_emission_status']] = self.update_ds_laser_emission_status
@@ -264,3 +266,7 @@ class MainController(object):
     #     print(kwargs['pvname'])
     #     print(kwargs['value'])
     #     print(kwargs['char_value'])
+
+    def pulse_running_signal_emitted(self, *kargs):
+        partial(self.config_controller.toggle_config_btns, not(kargs[0]))()
+        partial(self.mode_switch_controller.toggle_mode_switch_btns, not(kargs[0]))()

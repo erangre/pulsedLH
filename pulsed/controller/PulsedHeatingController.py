@@ -18,6 +18,7 @@ from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_P
 class PulsedHeatingController(QtCore.QObject):
 
     pulse_changed = QtCore.Signal()
+    pulse_running = QtCore.Signal(bool)
 
     def __init__(self, widget):
         """
@@ -152,8 +153,10 @@ class PulsedHeatingController(QtCore.QObject):
         self.write_to_log_file()
 
     def start_pulses_on_thread(self):
+        self.pulse_running.emit(True)
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_RUNNING'], wait=True)
         self.wait_until_pulses_end()
+        self.pulse_running.emit(False)
 
     def stop_pulse_btn_clicked(self):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
