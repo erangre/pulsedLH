@@ -12,6 +12,7 @@ from .ModeSwitchController import ModeSwitchController
 from .PulsedHeatingController import PulsedHeatingController
 from .ConfigController import ConfigController
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values
+from .utils import caput_lf
 
 MAIN_STATUS_OFF = 'Stopped'
 MAIN_STATUS_ON = 'Running'
@@ -163,6 +164,7 @@ class MainController(object):
             self.widget.laser_ds_status.setText(LASER_STATUS_PULSED)
             self.widget.laser_ds_status.setStyleSheet("font: bold 18px; color: blue;")
         self.update_main_mode_status()
+        self.mode_switch_controller.update_laser_btns_state()
 
     def update_us_laser_modulation_status(self, value=None, char_value=None):
         if value is None:
@@ -174,6 +176,7 @@ class MainController(object):
             self.widget.laser_us_status.setText(LASER_STATUS_PULSED)
             self.widget.laser_us_status.setStyleSheet("font: bold 18px; color: blue;")
         self.update_main_mode_status()
+        self.mode_switch_controller.update_laser_btns_state()
 
     def update_laser_status(self):
         self.update_ds_laser_emission_status()
@@ -191,6 +194,7 @@ class MainController(object):
             self.widget.pimax_status.setText(PIMAX_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
         self.update_main_mode_status()
+        self.mode_switch_controller.update_pimax_btns_state()
 
     def update_pil3_status(self, value=None, char_value=None):
         if value is None:
@@ -202,6 +206,7 @@ class MainController(object):
             self.widget.pil3_status.setText(PIL3_STATUS_NORMAL)
             self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
         self.update_main_mode_status()
+        self.mode_switch_controller.update_pil3_btns_state()
 
     def switch_tabs(self):
         if self.widget.pulsed_laser_heating_btn.isChecked():

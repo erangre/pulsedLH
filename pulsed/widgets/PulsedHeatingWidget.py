@@ -51,6 +51,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.ds_us_manual_delay_sb = QtWidgets.QDoubleSpinBox()
         self.gate_manual_delay_sb = QtWidgets.QDoubleSpinBox()
 
+        self.collect_quenched_xrd_btn = QtWidgets.QPushButton()
+
         self._layout = QtWidgets.QVBoxLayout()
         self._grid_layout = QtWidgets.QGridLayout()
         self.caption = QtWidgets.QLabel('Pulsed Laser Heating')

@@ -17,7 +17,7 @@ from ...controller.MainController import MainController
 from ...controller.MainController import MAIN_STATUS_OFF, MAIN_STATUS_ON, LASER_STATUS_NORMAL, LASER_STATUS_PULSED, \
     PIMAX_STATUS_NORMAL, PIMAX_STATUS_PULSED
 from ...controller.epics_config import pulse_PVs, general_PVs, pulse_values, general_values, laser_PVs, laser_values, \
-    lf_PVs, lf_values
+    lf_PVs, lf_values, pil3_PVs, pil3_values
 from ...controller.utils import caput_lf
 from ... import excepthook
 
@@ -231,3 +231,12 @@ class PulsedHeatingControllerTest(QtTest):
         self.widget.measure_diffraction_cb.setChecked(False)
         self.widget.start_pulse_btn.click()
         self.assertTrue(os.path.isfile(log_file))
+
+    def test_collect_quenched_xrd(self):
+        old_t_file = caget(lf_PVs['lf_last_file_name'], as_string=True)
+        # old_xrd_file = caget(pil3_PVs['file_name'], as_string=True)
+        self.widget.collect_quenched_xrd_btn.click()
+        self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_STOPPED'])
+        self.assertEqual(caget(lf_PVs['lf_last_file_name'], as_string=True), old_t_file)
+        # self.assertNotEqual(caget(pil3_PVs['file_name'], as_string=True), old_xrd_file)
+        # TODO - remove comments for PIL3

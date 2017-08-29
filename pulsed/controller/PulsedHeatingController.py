@@ -38,7 +38,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info = {}
         self.log_order = ['date_time', 'xrd_file_name', 'xrd_file_path', 't_file_name', 't_file_path', 'xrd_exp_time',
                           't_exp_time_per_frame', 'num_t_frames', 'num_t_accumulations', 'num_pulses', 'ds_percent',
-                          'us_percent', 'pulse_width']
+                          'us_percent', 'pulse_width', 'shutter']
         self.first_run = True
 
     def prepare_connections(self):
@@ -58,6 +58,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.start_timing_btn.clicked.connect(self.start_timing_btn_clicked)
         self.widget.ds_us_manual_delay_sb.valueChanged.connect(self.ds_us_manual_delay_changed)
         self.widget.gate_manual_delay_sb.valueChanged.connect(self.gate_manual_delay_changed)
+        self.widget.collect_quenched_xrd_btn.clicked.connect(self.collect_quenched_xrd_btn_clicked)
         for manual_delay_step_btn in self.widget.manual_delay_step_btns:
             manual_delay_step_btn.clicked.connect(partial(self.manual_delay_step_btn_clicked, manual_delay_step_btn))
 
@@ -247,6 +248,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['num_t_frames'] = caget(lf_PVs['lf_get_frames'])
         self.log_info['num_t_accumulations'] = caget(lf_PVs['lf_get_accs'])
         self.log_info['t_exp_time_per_frame'] = self.log_info['pulse_width'] * self.log_info['num_t_accumulations']
+        self.log_info['shutter'] = caget(general_PVs['laser_shutter_status'])
         # self.log_info['xrd_exp_time'] = self.log_info['pulse_width'] * caget(pil3_PVs['exposures_per_image'])
 
         # TODO - uncomment pilatus parts
@@ -288,3 +290,24 @@ class PulsedHeatingController(QtCore.QObject):
     def wait_until_pulses_end(self):
         while caget(pulse_PVs['BNC_run']) == pulse_values['BNC_RUNNING']:
             time.sleep(0.1)
+
+    def collect_quenched_xrd_btn_clicked(self):
+        self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
+
+        if self.first_run:
+            self.write_headings()
+            self.first_run = False
+        caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
+        self.collect_info_for_log()
+
+        bnc_run_thread = Thread(target=self.start_pulses_on_thread)
+        bnc_run_thread.start()
+
+        while bnc_run_thread.isAlive():
+            QtWidgets.QApplication.processEvents()
+            time.sleep(0.1)
+
+        self.collect_xrd_and_t_info_for_log(xrd=True, temperature=False)
+        self.write_to_log_file()
+

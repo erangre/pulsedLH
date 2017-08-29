@@ -75,6 +75,8 @@ lf_PVs = {
     'lf_set_accs': '13IDDLF1:cam1:NumAccumulations',
     'lf_get_frames': '13IDDLF1:cam1:NumImages_RBV',
     'lf_set_frames': '13IDDLF1:cam1:NumImages',
+    'lf_get_bg_file_name': '13IDDLF1:cam1:LFBackgroundFile_RBV',
+    'lf_set_bg_file_name':'13IDDLF1:cam1:LFBackgroundFile',
 }
 
 lf_values = {
@@ -83,6 +85,8 @@ lf_values = {
     'lf_detector_idle': 'Idle',
     'lf_Done': 0,
     'lf_Acquiring': 1,
+    'PIMAX_normal_bg_file_name': 'b_pimax',
+    'PIMAX_pulsed_bg_file_name': 'b_pimax_pulsed',
 }
 
 pil3_prefix = '13PIL3:cam1:'

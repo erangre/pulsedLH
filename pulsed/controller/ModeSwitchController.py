@@ -96,10 +96,12 @@ class ModeSwitchController(object):
     def pimax_to_pulsed_btn_clicked(self):
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
+        caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_pulsed_bg_file_name'], wait=True)
 
     def pimax_to_normal_btn_clicked(self):
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_normal'], wait=True)
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_normal'], wait=True)
+        caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_normal_bg_file_name'], wait=True)
 
     def update_pimax_btns_state(self):
         if caget(lf_PVs['lf_get_experiment'], as_string=True) == lf_values['PIMAX_normal']:

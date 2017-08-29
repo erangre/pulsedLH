@@ -53,8 +53,10 @@ class ModeSwitchControllerTest(QtTest):
         self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_normal'])
         self.widget.mode_switch_widget.pimax_to_pulsed_btn.click()
         self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_pulsed'])
+        self.assertEqual(caget(lf_PVs['lf_get_bg_file_name'], as_string=True), lf_values['PIMAX_pulsed_bg_file_name'])
         self.widget.mode_switch_widget.pimax_to_normal_btn.click()
         self.assertEqual(caget(lf_PVs['lf_get_experiment'], as_string=True), lf_values['PIMAX_normal'])
+        self.assertEqual(caget(lf_PVs['lf_get_bg_file_name'], as_string=True), lf_values['PIMAX_normal_bg_file_name'])
 
     def test_switch_pilatus_to_pulsed_and_back(self):
         self.assertEqual(caget(pil3_PVs['trigger_mode']), pil3_values['trigger_internal'])

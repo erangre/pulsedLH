@@ -19,7 +19,7 @@ class ModeSwitchWidget(QtWidgets.QGroupBox):
         self.ds_laser_btn_group.addButton(self.ds_laser_pulsed_btn)
         self.ds_laser_btn_group.addButton(self.ds_laser_normal_btn)
 
-        self.us_laser_lbl = QtWidgets.QLabel('DS Laser Mode:')
+        self.us_laser_lbl = QtWidgets.QLabel('US Laser Mode:')
         self.us_laser_normal_btn = QtWidgets.QPushButton('Normal')
         self.us_laser_pulsed_btn = QtWidgets.QPushButton('Pulsed')
         self.us_laser_btn_group = QtWidgets.QButtonGroup()
