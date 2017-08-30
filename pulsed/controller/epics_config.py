@@ -63,6 +63,8 @@ laser_PVs = {
     'us_laser_percent_tweak': '13IDD:DAC2_3_tweakVal',
     'ds_emission_status': '13IDD:Laser2Emission',
     'us_emission_status': '13IDD:Laser1Emission',
+    'ds_laser_power_supply': '13IDD:Laser2PowerSupply',
+    'us_laser_power_supply': '13IDD:Laser1PowerSupply',
 }
 
 laser_values = {
@@ -70,6 +72,8 @@ laser_values = {
     'modulation_disabled': 0,
     'emission_off': 0,
     'emission_on': 1,
+    'power_supply_on': 0,
+    'power_supply_off': 1,
 }
 
 lf_PVs = {

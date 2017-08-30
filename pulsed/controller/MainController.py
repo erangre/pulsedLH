@@ -127,7 +127,8 @@ class MainController(object):
     def update_ds_laser_emission_status(self, value=None, char_value=None):
         if value is None:
             value = caget(laser_PVs['ds_emission_status'])
-        if value == laser_values['emission_off']:
+        power_supply = caget(laser_PVs['ds_laser_power_supply'])
+        if value == laser_values['emission_off'] or power_supply == laser_values['power_supply_off']:
             self.widget.laser_ds_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_ds_emission_status.setStyleSheet("font: bold 18px; color: black;")
             self.widget.mode_switch_widget.ds_laser_normal_btn.setEnabled(True)
@@ -142,7 +143,8 @@ class MainController(object):
     def update_us_laser_emission_status(self, value=None, char_value=None):
         if value is None:
             value = caget(laser_PVs['us_emission_status'])
-        if value == laser_values['emission_off']:
+        power_supply = caget(laser_PVs['us_laser_power_supply'])
+        if value == laser_values['emission_off'] or power_supply == laser_values['power_supply_off']:
             self.widget.laser_us_emission_status.setText(LASER_EMISSION_OFF)
             self.widget.laser_us_emission_status.setStyleSheet("font: bold 18px; color: black;")
             self.widget.mode_switch_widget.us_laser_normal_btn.setEnabled(True)
