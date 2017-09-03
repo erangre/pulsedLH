@@ -4,8 +4,10 @@ import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
 from functools import partial
-
-from epics import caget, caput, PV
+try:
+    from epics import caget, caput, PV
+except ImportError:
+    exit(2)
 
 from ..widgets.MainWidget import MainWidget
 from .ModeSwitchController import ModeSwitchController
@@ -47,6 +49,7 @@ class MainController(object):
             self.settings_directory = settings_directory
 
         # self.model = pulsed_lh_model()
+
         self.mode_switch_controller = ModeSwitchController(self.widget)
         self.pulsed_heating_controller = PulsedHeatingController(self.widget)
         self.config_controller = ConfigController(self.widget)

@@ -1,7 +1,10 @@
-from epics import caput, caget
+try:
+    from epics import caput, caget
+except ImportError:
+    exit(2)
+
 from .epics_config import lf_PVs, lf_values, pil3_PVs, pil3_values
 import time
-
 
 def caput_lf(pv, value, wait=True):
     if not caget(lf_PVs['lf_detector_state'], as_string=True) == lf_values['lf_detector_idle']:

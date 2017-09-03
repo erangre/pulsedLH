@@ -6,7 +6,10 @@ from qtpy import QtWidgets, QtCore
 from functools import partial
 from threading import Thread
 
-from epics import caget, caput
+try:
+    from epics import caget, caput
+except ImportError:
+    exit(2)
 
 from ..widgets.MainWidget import MainWidget
 from ..model.WidthDelayModel import WidthDelayModel

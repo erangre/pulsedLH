@@ -4,7 +4,10 @@ import time
 from sys import platform as _platform
 from qtpy import QtWidgets, QtCore
 
-from epics import caget, caput
+try:
+    from epics import caget, caput
+except ImportError:
+    exit(2)
 
 from ..widgets.MainWidget import MainWidget
 from .utils import caput_lf, caput_pil3
