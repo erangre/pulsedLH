@@ -12,7 +12,7 @@ pulse_PVs = {
     'BNC_T4_delay': bnc_prefix + 'P4:Delay',
     'BNC_T1_enable': bnc_prefix + 'P1:State',
     'BNC_T2_enable': bnc_prefix + 'P2:State',
-    'BNC_T$_enable': bnc_prefix + 'P4:State',
+    'BNC_T4_enable': bnc_prefix + 'P4:State',
     'BNC_burst_count': bnc_prefix + 'BurstCount'
 }
 
@@ -25,16 +25,19 @@ pulse_values = {
     'BNC_DISABLE': 0,
 }
 
+unidig1_prefix = "13IDD:Unidig1"
+unidig2_prefix = "13IDD:Unidig2"
+
 general_PVs = {
-    'laser_shutter_status': '13IDD:Unidig2Bi4.VAL',
-    'laser_shutter_control': '13IDD:Unidig2Bo4',
-    'pilatus_gate_control': '13IDD:Unidig2Bo20',
-    'xrd_shutter_control': '13IDD:Unidig1Bo11',
-    'xrd_shutter_status': '13IDD:Unidig1Bi11.VAL',
-    'ds_light_control': '13IDD:Unidig1Bo22',
-    'ds_light_status': '13IDD:Unidig1Bi22.VAL',
-    'us_light_control': '13IDD:Unidig1Bo20',
-    'us_light_status': '13IDD:Unidig1Bi20.VAL',
+    'laser_shutter_status': unidig2_prefix + 'Bi4.VAL',
+    'laser_shutter_control': unidig2_prefix + 'Bo4',
+    'pilatus_gate_control': unidig2_prefix + 'Bo20',
+    'xrd_shutter_control': unidig1_prefix + 'Bo11',
+    'xrd_shutter_status': unidig1_prefix + 'Bi11.VAL',
+    'ds_light_control': unidig1_prefix + 'Bo22',
+    'ds_light_status': unidig1_prefix + 'Bi22.VAL',
+    'us_light_control': unidig1_prefix + 'Bo20',
+    'us_light_status': unidig1_prefix + 'Bi20.VAL',
 }
 
 general_values = {
@@ -48,23 +51,24 @@ general_values = {
     'light_on': 1,
 }
 
-# TODO - maybe change to a prefix like for BNC
+laser1_prefix = '13IDD:Laser1'
+laser2_prefix = '13IDD:Laser2'
 
 laser_PVs = {
-    'ds_enable_modulation': '13IDD:Laser2EnableModulation.PROC',
-    'ds_disable_modulation': '13IDD:Laser2DisableModulation.PROC',
-    'ds_modulation_status': '13IDD:Laser2Modulation',
-    'us_enable_modulation': '13IDD:Laser1EnableModulation.PROC',
-    'us_disable_modulation': '13IDD:Laser1DisableModulation.PROC',
-    'us_modulation_status': '13IDD:Laser1Modulation',
+    'ds_enable_modulation': laser2_prefix + 'EnableModulation.PROC',
+    'ds_disable_modulation': laser2_prefix + 'DisableModulation.PROC',
+    'ds_modulation_status': laser2_prefix + 'Modulation',
+    'us_enable_modulation': laser1_prefix + 'EnableModulation.PROC',
+    'us_disable_modulation': laser1_prefix + 'DisableModulation.PROC',
+    'us_modulation_status': laser1_prefix + 'Modulation',
     'ds_laser_percent': '13IDD:DAC2_4.VAL',
     'ds_laser_percent_tweak': '13IDD:DAC2_4_tweakVal',
     'us_laser_percent': '13IDD:DAC2_3.VAL',
     'us_laser_percent_tweak': '13IDD:DAC2_3_tweakVal',
-    'ds_emission_status': '13IDD:Laser2Emission',
-    'us_emission_status': '13IDD:Laser1Emission',
-    'ds_laser_power_supply': '13IDD:Laser2PowerSupply',
-    'us_laser_power_supply': '13IDD:Laser1PowerSupply',
+    'ds_emission_status': laser2_prefix + 'Emission',
+    'us_emission_status': laser1_prefix + 'Emission',
+    'ds_laser_power_supply': laser2_prefix + 'PowerSupply',
+    'us_laser_power_supply': laser1_prefix + 'PowerSupply',
 }
 
 laser_values = {
@@ -76,24 +80,26 @@ laser_values = {
     'power_supply_off': 1,
 }
 
+lf_prefix = '13IDDLF1:cam1:'
+
 lf_PVs = {
-    'lf_set_experiment': '13IDDLF1:cam1:LFExperimentName',
-    'lf_get_experiment': '13IDDLF1:cam1:LFExperimentName_RBV',
-    'lf_set_trigger_mode': '13IDDLF1:cam1:TriggerMode',
-    'lf_get_trigger_mode': '13IDDLF1:cam1:TriggerMode_RBV',
-    'lf_detector_state': '13IDDLF1:cam1:DetectorState_RBV',
-    'lf_last_file_name': '13IDDLF1:cam1:LFFileName_RBV',
-    'lf_full_file_name': '13IDDLF1:cam1:FullFileName_RBV',
-    'lf_acquire': '13IDDLF1:cam1:Acquire',
-    'lf_get_accs': '13IDDLF1:cam1:NumAccumulations_RBV',
-    'lf_set_accs': '13IDDLF1:cam1:NumAccumulations',
-    'lf_get_frames': '13IDDLF1:cam1:NumImages_RBV',
-    'lf_set_frames': '13IDDLF1:cam1:NumImages',
-    'lf_get_bg_file_name': '13IDDLF1:cam1:LFBackgroundFile_RBV',
-    'lf_set_bg_file_name':'13IDDLF1:cam1:LFBackgroundFile',
-    'lf_set_image_mode': '13IDDLF1:cam1:ImageMode',
-    'lf_get_image_mode': '13IDDLF1:cam1:ImageMode_RBV',
-    'lf_set_internal_trigger_freq': '13IDDLF1:cam1:LFTriggerFrequency',
+    'lf_set_experiment': lf_prefix + 'LFExperimentName',
+    'lf_get_experiment': lf_prefix + 'LFExperimentName_RBV',
+    'lf_set_trigger_mode': lf_prefix + 'TriggerMode',
+    'lf_get_trigger_mode': lf_prefix + 'TriggerMode_RBV',
+    'lf_detector_state': lf_prefix + 'DetectorState_RBV',
+    'lf_last_file_name': lf_prefix + 'LFFileName_RBV',
+    'lf_full_file_name': lf_prefix + 'FullFileName_RBV',
+    'lf_acquire': lf_prefix + 'Acquire',
+    'lf_get_accs': lf_prefix + 'NumAccumulations_RBV',
+    'lf_set_accs': lf_prefix + 'NumAccumulations',
+    'lf_get_frames': lf_prefix + 'NumImages_RBV',
+    'lf_set_frames': lf_prefix + 'NumImages',
+    'lf_get_bg_file_name': lf_prefix + 'LFBackgroundFile_RBV',
+    'lf_set_bg_file_name':lf_prefix + 'LFBackgroundFile',
+    'lf_set_image_mode': lf_prefix + 'ImageMode',
+    'lf_get_image_mode': lf_prefix + 'ImageMode_RBV',
+    'lf_set_internal_trigger_freq': lf_prefix + 'LFTriggerFrequency',
 }
 
 lf_values = {

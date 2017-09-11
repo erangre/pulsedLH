@@ -220,12 +220,20 @@ class PulsedHeatingController(QtCore.QObject):
         self.timing_adjusted = False
         self.toggle_percent_and_timing_btns(False)
         QtWidgets.QApplication.processEvents()
-        f = 1.0/caget(pulse_PVs['BNC_period'])
+        period = caget(pulse_PVs['BNC_period'])
+        if period is not None:
+            f = 1.0/period
+        else:
+            f = 1E4
         w = 1.0  # TODO change this to read from settings the pulse width
         ds_percent = caget(laser_PVs['ds_laser_percent'], as_string=False)
         us_percent = caget(laser_PVs['us_laser_percent'], as_string=False)
         ds_us_manual_delay = self.widget.ds_us_manual_delay_sb.value()
         gate_manual_delay = self.widget.gate_manual_delay_sb.value()
+        if us_percent is None:
+            us_percent = 10.0
+        if ds_percent is None:
+            ds_percent = 10.0
         timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent, ds_us_manual_delay,
                                                         gate_manual_delay)
         caput(pulse_PVs['BNC_T1_delay'], timings['delay_t1'], wait=True)
@@ -240,12 +248,14 @@ class PulsedHeatingController(QtCore.QObject):
     def ds_laser_percent_changed(self, value=None, char_value=None):
         if value is None:
             value = caget(laser_PVs['ds_laser_percent'])
-        self.widget.ds_percent_display_le.setText(str(round(value, 2)))
+        if value is not None:
+            self.widget.ds_percent_display_le.setText(str(round(value, 2)))
 
     def us_laser_percent_changed(self, value=None, char_value=None):
         if value is None:
             value = caget(laser_PVs['us_laser_percent'])
-        self.widget.us_percent_display_le.setText(str(round(value, 2)))
+        if value is not None:
+            self.widget.us_percent_display_le.setText(str(round(value, 2)))
 
     def toggle_percent_and_timing_btns(self, toggle):
         self.widget.both_increase_percent_btn.setEnabled(toggle)
