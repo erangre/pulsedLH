@@ -54,11 +54,16 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.collect_quenched_xrd_btn = QtWidgets.QPushButton('Collect quenched XRD')
         self.measure_t_background_btn = QtWidgets.QPushButton('Measure T BG')
 
+        self.multi_gate_toggle_btn = QtWidgets.QPushButton('Multi-Gate')
+
+        self.multi_gate_widget = MultiGateWidget()
+
         self._layout = QtWidgets.QVBoxLayout()
         self._grid_layout = QtWidgets.QGridLayout()
         self.caption = QtWidgets.QLabel('Pulsed Laser Heating')
         self._layout.addWidget(self.caption)
         self._layout.addLayout(self._grid_layout)
+        self._layout.addWidget(self.multi_gate_widget)
 
         self._grid_layout.addWidget(self.start_timing_btn, 0, 0, 1, 1)
         self._grid_layout.addWidget(self.stop_pulse_btn, 0, 3, 2, 2)
@@ -97,6 +102,7 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.measure_diffraction_cb, 9, 1, 1, 1)
         self._grid_layout.addWidget(self.collect_quenched_xrd_btn, 9, 2, 1, 2)
         self._grid_layout.addWidget(self.measure_t_background_btn, 9, 4, 1, 2)
+        self._grid_layout.addWidget(self.multi_gate_toggle_btn, 10, 0, 1, 1)
 
         self.setLayout(self._layout)
 
@@ -137,9 +143,28 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.gate_manual_delay_sb.setDecimals(3)
         self.measure_temperature_cb.setChecked(True)
         self.measure_diffraction_cb.setChecked(True)
+        self.multi_gate_widget.setVisible(False)
+        self.multi_gate_toggle_btn.setCheckable(True)
+        self.multi_gate_toggle_btn.setChecked(False)
 
     def update_timing_labels(self, timings):
         self.ds_delay_le.setText(str(round(timings['delay_t1'] * 1E6, 3)))
         self.us_delay_le.setText(str(round(timings['delay_t2'] * 1E6, 3)))
         self.ds_width_le.setText(str(round(timings['width_t1'] * 1E6, 3)))
         self.us_width_le.setText(str(round(timings['width_t2'] * 1E6, 3)))
+
+
+class MultiGateWidget(QtWidgets.QGroupBox):
+    def __init__(self, *args, **kwargs):
+        super(MultiGateWidget, self).__init__(*args, **kwargs)
+
+        self.multi_gate_lbl = QtWidgets.QLabel('Gate delay values, \xB5s (comma separated)')
+        self.multi_gate_values_le = QtWidgets.QLineEdit('-1,0,1,2,3')
+        self.run_multi_gate_btn = QtWidgets.QPushButton('Run Multi-Gate')
+
+        self._main_layout = QtWidgets.QHBoxLayout()
+        self._main_layout.addWidget(self.multi_gate_lbl)
+        self._main_layout.addWidget(self.multi_gate_values_le)
+        self._main_layout.addStretch(1)
+        self._main_layout.addWidget(self.run_multi_gate_btn)
+        self.setLayout(self._main_layout)

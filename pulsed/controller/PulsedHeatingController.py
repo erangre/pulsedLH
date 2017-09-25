@@ -43,7 +43,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.timing_adjusted = False
         self.log_order = ['date_time', 'xrd_file_name', 'xrd_file_path', 't_file_name', 't_file_path', 'xrd_exp_time',
                           't_exp_time_per_frame', 'num_t_frames', 'num_t_accumulations', 'num_pulses', 'ds_percent',
-                          'us_percent', 'pulse_width', 'shutter']
+                          'us_percent', 'pulse_width', 'shutter', 'manual_gate_delay']
         self.first_run = True
 
     def prepare_connections(self):
@@ -69,6 +69,10 @@ class PulsedHeatingController(QtCore.QObject):
 
         self.widget.collect_quenched_xrd_btn.clicked.connect(self.collect_quenched_xrd_btn_clicked)
         self.widget.measure_t_background_btn.clicked.connect(self.measure_t_background_btn_clicked)
+
+        self.widget.multi_gate_toggle_btn.clicked.connect(self.multi_gate_toggle_btn_clicked)
+
+        self.widget.multi_gate_widget.run_multi_gate_btn.clicked.connect(self.run_multi_gate_btn_clicked)
 
         self.pulse_changed.connect(self.update_bnc_timings)
 
@@ -132,7 +136,10 @@ class PulsedHeatingController(QtCore.QObject):
         caput(dec_pv, 1, wait=True)
         self.pulse_changed.emit()
 
-    def start_pulse_btn_clicked(self):
+    def start_pulse_btn_clicked(self, gate_delays=None):
+        if gate_delays is None:
+            gate_delays = [0]
+
         if caget(laser_PVs['ds_modulation_status']) == 0 or caget(laser_PVs['us_modulation_status']) == 0:
             msg = QtWidgets.QMessageBox()
             msg.setText("One (or both) of the lasers are in CW mode.\nAre you sure you want to proceed?")
@@ -155,6 +162,19 @@ class PulsedHeatingController(QtCore.QObject):
             self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
+        manual_gate_delay = self.widget.gate_manual_delay_sb.value()
+        for gate_delay in gate_delays:
+            try:
+                delay = float(gate_delay)
+            except ValueError:
+                continue
+            self.start_pulses_for_single_gate_delay(delay + manual_gate_delay)
+
+        self.widget.gate_manual_delay_sb.setValue(manual_gate_delay)
+        self.log_file.close()
+
+    def start_pulses_for_single_gate_delay(self, gate_delay):
+        self.widget.gate_manual_delay_sb.setValue(gate_delay)
         self.collect_info_for_log()
         if self.widget.measure_temperature_cb.isChecked():
             if self.bg_collected_for is None or not caget(lf_PVs['lf_get_accs']) == self.bg_collected_for:
@@ -293,7 +313,8 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['pulse_width'] = caget(pulse_PVs['BNC_T4_width'])
         self.log_info['ds_delay'] = caget(pulse_PVs['BNC_T1_delay'])
         self.log_info['us_delay'] = caget(pulse_PVs['BNC_T2_delay'])
-        self.log_info['gate_delay'] = caget(pulse_PVs['BNC_T4_delay'])
+        self.log_info['total_gate_delay'] = caget(pulse_PVs['BNC_T4_delay'])
+        self.log_info['manual_gate_delay'] = self.widget.gate_manual_delay_sb.value()
         self.log_info['ds_width'] = caget(pulse_PVs['BNC_T1_delay'])
         self.log_info['us_width'] = caget(pulse_PVs['BNC_T2_delay'])
         self.log_info['num_t_frames'] = caget(lf_PVs['lf_get_frames'])
@@ -330,7 +351,6 @@ class PulsedHeatingController(QtCore.QObject):
             self.log_file.write(str(self.log_info[item]) + '\t')
         self.log_file.write('\n')
         self.log_file.flush()
-        self.log_file.close()
 
     def write_headings(self):
         for item in self.log_order:
@@ -361,6 +381,7 @@ class PulsedHeatingController(QtCore.QObject):
 
         self.collect_xrd_and_t_info_for_log(xrd=True, temperature=False)
         self.write_to_log_file()
+        self.log_file.close()
 
     def measure_t_background_btn_clicked(self):
         lf_experiment = caget(lf_PVs['lf_get_experiment'], as_string=True)
@@ -398,3 +419,10 @@ class PulsedHeatingController(QtCore.QObject):
             else:
                 caput(item, previous_settings[item], wait=True)
         self.bg_collected_for = caget(lf_PVs['lf_get_accs'])
+
+    def multi_gate_toggle_btn_clicked(self):
+        self.widget.multi_gate_widget.setVisible(not(self.widget.multi_gate_widget.isVisible()))
+
+    def run_multi_gate_btn_clicked(self):
+        gate_delays = self.widget.multi_gate_widget.multi_gate_values_le.text().replace(' ', '').split(',')
+        self.start_pulse_btn_clicked(gate_delays)

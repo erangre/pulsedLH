@@ -80,3 +80,11 @@ class MainControllerTest(QtTest):
         # but not the test since emission cannot be controlled programmatically.
         self.assertEqual(self.widget.laser_ds_emission_status.text(), LASER_EMISSION_OFF)
         self.assertEqual(self.widget.laser_us_emission_status.text(), LASER_EMISSION_OFF)
+
+    def test_multi_gate_panel_appears_and_disappears_when_clicked(self):
+        self.controller.show_window()
+        self.assertFalse(self.widget.pulsed_laser_heating_widget.multi_gate_widget.isVisible())
+        self.widget.pulsed_laser_heating_widget.multi_gate_toggle_btn.click()
+        self.assertTrue(self.widget.pulsed_laser_heating_widget.multi_gate_widget.isVisible())
+        self.widget.pulsed_laser_heating_widget.multi_gate_toggle_btn.click()
+        self.assertFalse(self.widget.pulsed_laser_heating_widget.multi_gate_widget.isVisible())
