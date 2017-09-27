@@ -140,9 +140,9 @@ class ModeSwitchController(object):
 
     def update_pil3_btns_state(self):
         if caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_internal']:
-            self.widget.mode_switch_widget.pimax_to_normal_btn.setChecked(True)
+            self.widget.mode_switch_widget.pil3_to_normal_btn.setChecked(True)
         elif caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_external_enable']:
-            self.widget.mode_switch_widget.pimax_to_pulsed_btn.setChecked(True)
+            self.widget.mode_switch_widget.pil3_to_pulsed_btn.setChecked(True)
 
     def all_to_normal_btn_clicked(self):
         self.ds_laser_normal_btn_clicked()

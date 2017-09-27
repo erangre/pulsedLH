@@ -204,12 +204,12 @@ class MainController(object):
     def update_pil3_status(self, value=None, char_value=None):
         if value is None:
             value = caget(pil3_PVs['trigger_mode'])
-        if char_value == pil3_values['trigger_external_enable']:
+        if value == pil3_values['trigger_external_enable']:
             self.widget.pil3_status.setText(PIL3_STATUS_PULSED)
-            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: blue;")
+            self.widget.pil3_status.setStyleSheet("font: bold 18px; color: blue;")
         else:
             self.widget.pil3_status.setText(PIL3_STATUS_NORMAL)
-            self.widget.pimax_status.setStyleSheet("font: bold 18px; color: black;")
+            self.widget.pil3_status.setStyleSheet("font: bold 18px; color: black;")
         self.update_main_mode_status()
         self.mode_switch_controller.update_pil3_btns_state()
 
