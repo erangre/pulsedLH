@@ -136,7 +136,9 @@ class PulsedHeatingController(QtCore.QObject):
         caput(dec_pv, 1, wait=True)
         self.pulse_changed.emit()
 
-    def start_pulse_btn_clicked(self, gate_delays=None):
+    def start_pulse_btn_clicked(self, **kwargs):
+        gate_delays = kwargs.get('gate_delays', None)
+
         if gate_delays is None:
             gate_delays = [0]
 
@@ -424,4 +426,4 @@ class PulsedHeatingController(QtCore.QObject):
 
     def run_multi_gate_btn_clicked(self):
         gate_delays = self.widget.multi_gate_widget.multi_gate_values_le.text().replace(' ', '').split(',')
-        self.start_pulse_btn_clicked(gate_delays)
+        self.start_pulse_btn_clicked(gate_delays=gate_delays)
