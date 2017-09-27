@@ -68,17 +68,16 @@ class ModeSwitchControllerTest(QtTest):
         self.assertTrue(self.widget.mode_switch_widget.ds_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.us_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.pimax_to_normal_btn.isChecked())
-        # self.assertTrue(self.widget.mode_switch_widget.pil3_to_normal_btn.isChecked())
+        self.assertTrue(self.widget.mode_switch_widget.pil3_to_normal_btn.isChecked())
         self.widget.mode_switch_widget.all_to_pulsed_btn.click()
         self.assertTrue(self.widget.mode_switch_widget.ds_laser_pulsed_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.us_laser_pulsed_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.pimax_to_pulsed_btn.isChecked())
-        # self.assertTrue(self.widget.mode_switch_widget.pil3_to_pulsed_btn.isChecked())
+        self.assertTrue(self.widget.mode_switch_widget.pil3_to_pulsed_btn.isChecked())
         self.widget.mode_switch_widget.all_to_normal_btn.click()
         self.assertTrue(self.widget.mode_switch_widget.ds_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.us_laser_normal_btn.isChecked())
         self.assertTrue(self.widget.mode_switch_widget.pimax_to_normal_btn.isChecked())
-        # self.assertTrue(self.widget.mode_switch_widget.pil3_to_normal_btn.isChecked())
+        self.assertTrue(self.widget.mode_switch_widget.pil3_to_normal_btn.isChecked())
 
-        # TODO uncomment pilatus parts
 

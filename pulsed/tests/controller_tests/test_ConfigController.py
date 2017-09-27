@@ -45,7 +45,7 @@ class PulsedHeatingControllerTest(QtTest):
                                                        DEFAULT_MAX_NUM_PIMAX_FRAMES)
         self.assertEqual(caget(lf_PVs['lf_get_accs']), accs)
         self.assertEqual(caget(lf_PVs['lf_get_frames']), frames)
-        # self.assertEqual(caget(pil3_PVs['exposures_per_image']), DEFAULT_NUM_PULSES)
+        self.assertEqual(caget(pil3_PVs['exposures_per_image']), DEFAULT_NUM_PULSES)
         old_bnc_burst_count = caget(pulse_PVs['BNC_burst_count'])
         self.assertEqual(old_bnc_burst_count, self.widget.num_pulses_sb.value() * PULSE_FACTOR)
 
@@ -55,12 +55,11 @@ class PulsedHeatingControllerTest(QtTest):
         time.sleep(0.1)
 
         self.assertEqual(caget(pulse_PVs['BNC_burst_count']), num_pulses * PULSE_FACTOR)
-        # self.assertEqual(caget(pil3_PVs['exposures_per_image']), num_pulses)
+        self.assertEqual(caget(pil3_PVs['exposures_per_image']), num_pulses)
         accs, frames = self.model.calc_frames_and_accs(num_pulses, DEFAULT_MAX_NUM_PIMAX_ACCS, PIMAX_FACTOR,
                                                        DEFAULT_MAX_NUM_PIMAX_FRAMES)
         self.assertEqual(caget(lf_PVs['lf_get_accs']), accs)
         self.assertEqual(caget(lf_PVs['lf_get_frames']), frames)
-        # TODO - uncomment pilatus parts
 
     def test_set_max_number_of_pimax_accumulations(self):
         self.widget.num_pulses_sb.setValue(DEFAULT_MAX_NUM_PIMAX_ACCS * 4/PIMAX_FACTOR)

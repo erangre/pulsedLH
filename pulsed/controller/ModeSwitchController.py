@@ -148,21 +148,19 @@ class ModeSwitchController(object):
         self.ds_laser_normal_btn_clicked()
         self.us_laser_normal_btn_clicked()
         self.pimax_to_normal_btn_clicked()
-        # self.pil3_to_normal_btn_clicked()
+        self.pil3_to_normal_btn_clicked()
         self.update_laser_btns_state()
         self.update_pimax_btns_state()
         self.update_pil3_btns_state()
-        # TODO - uncomment pilatus
 
     def all_to_pulsed_btn_clicked(self):
         self.ds_laser_pulsed_btn_clicked()
         self.us_laser_pulsed_btn_clicked()
         self.pimax_to_pulsed_btn_clicked()
-        # self.pil3_to_pulsed_btn_clicked()
+        self.pil3_to_pulsed_btn_clicked()
         self.update_laser_btns_state()
         self.update_pimax_btns_state()
         self.update_pil3_btns_state()
-        # TODO - uncomment pilatus
 
     def toggle_mode_switch_btns(self, toggle):
         self.widget.mode_switch_widget.pil3_to_normal_btn.setEnabled(toggle)

@@ -54,15 +54,13 @@ class ConfigController(object):
                                                        DEFAULT_MAX_NUM_PIMAX_FRAMES)
         caput_lf(lf_PVs['lf_set_accs'], accs)
         caput_lf(lf_PVs['lf_set_frames'], frames)
-        # caput(pil3_PVs['exposures_per_image'], DEFAULT_NUM_PULSES)
-        # TODO - uncomment pilatus settings
+        caput(pil3_PVs['exposures_per_image'], DEFAULT_NUM_PULSES)
 
     def num_pulses_sb_changed(self):
         num_pulses = self.widget.num_pulses_sb.value()
         caput(pulse_PVs['BNC_burst_count'], num_pulses * PULSE_FACTOR)
         self.update_lf_settings(num_pulses)
-        # caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
-        # TODO - uncomment pilatus settings
+        caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
 
     def pimax_max_num_accs_sb_changed(self):
         num_pulses = self.widget.num_pulses_sb.value()

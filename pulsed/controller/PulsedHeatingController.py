@@ -321,9 +321,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['num_t_accumulations'] = caget(lf_PVs['lf_get_accs'])
         self.log_info['t_exp_time_per_frame'] = self.log_info['pulse_width'] * self.log_info['num_t_accumulations']
         self.log_info['shutter'] = caget(general_PVs['laser_shutter_status'])
-        # self.log_info['xrd_exp_time'] = self.log_info['pulse_width'] * caget(pil3_PVs['exposures_per_image'])
-
-        # TODO - uncomment pilatus parts
+        self.log_info['xrd_exp_time'] = self.log_info['pulse_width'] * caget(pil3_PVs['exposures_per_image'])
 
     def collect_xrd_and_t_info_for_log(self, xrd=False, temperature=False):
         if not xrd:
@@ -369,6 +367,7 @@ class PulsedHeatingController(QtCore.QObject):
             self.write_headings()
             self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        caput(pil3_PVs['Acquire'], 1, wait=False)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         self.collect_info_for_log()
 

@@ -234,13 +234,14 @@ class PulsedHeatingControllerTest(QtTest):
 
     def test_collect_quenched_xrd(self):
         old_t_file = caget(lf_PVs['lf_last_file_name'], as_string=True)
-        # old_xrd_file = caget(pil3_PVs['file_name'], as_string=True)
+        old_xrd_file = caget(pil3_PVs['file_name'], as_string=True)
+        self.main_controller.widget.mode_switch_widget.pil3_to_pulsed_btn.click()
+        time.sleep(0.5)
         self.widget.collect_quenched_xrd_btn.click()
         self.assertEqual(caget(pulse_PVs['BNC_run']), pulse_values['BNC_STOPPED'])  # maybe not good here. maybe needs
         # to be running
         self.assertEqual(caget(lf_PVs['lf_last_file_name'], as_string=True), old_t_file)
-        # self.assertNotEqual(caget(pil3_PVs['file_name'], as_string=True), old_xrd_file)
-        # TODO - remove comments for PIL3
+        self.assertNotEqual(caget(pil3_PVs['file_name'], as_string=True), old_xrd_file)
 
     def test_measure_t_background(self):
         self.widget.measure_t_background_btn.click()
