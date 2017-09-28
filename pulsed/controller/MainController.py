@@ -83,6 +83,7 @@ class MainController(object):
         self.widget.configuration_btn.clicked.connect(self.switch_tabs)
         self.pulsed_heating_controller.pulse_running.connect(self.pulse_running_signal_emitted)
         # self.pv_changed.connect(self.pv_changed_emitted)
+        self.mode_switch_controller.pimax_mode_changed.connect(self.config_controller.update_lf_settings)
         self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
         self.callbacks[laser_PVs['ds_emission_status']] = self.update_ds_laser_emission_status
         self.callbacks[laser_PVs['us_emission_status']] = self.update_us_laser_emission_status

@@ -72,7 +72,9 @@ class ConfigController(object):
         num_pulses = self.widget.num_pulses_sb.value()
         self.update_lf_settings(num_pulses)
 
-    def update_lf_settings(self, num_pulses):
+    def update_lf_settings(self, num_pulses=None):
+        if num_pulses is None:
+            num_pulses = self.widget.num_pulses_sb.value()
         # self.toggle_config_btns(False)
         # QtWidgets.QApplication.processEvents()
         # problem with disabling widgets - currently edited spinbox loses focus.

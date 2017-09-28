@@ -15,12 +15,16 @@ from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_P
     general_PVs, general_values
 
 
-class ModeSwitchController(object):
+class ModeSwitchController(QtCore.QObject):
+
+    pimax_mode_changed = QtCore.Signal()
+
     def __init__(self, widget):
         """
         :param widget:
         :type widget: MainWidget
         """
+        super(ModeSwitchController, self).__init__()
         self.widget = widget
         self.old_settings = {}
         self.prepare_connections()
@@ -114,6 +118,7 @@ class ModeSwitchController(object):
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
         caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_pulsed_bg_file_name'], wait=True)
         self.widget.main_status.setText(self.previous_status)
+        self.pimax_mode_changed.emit()
 
     def pimax_to_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching PIMAX to normal mode. Please Wait')
