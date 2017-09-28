@@ -142,6 +142,15 @@ class PulsedHeatingController(QtCore.QObject):
         if gate_delays is None:
             gate_delays = [0]
 
+        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
+                        caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            retval = msg.exec_()
+            if retval == QtWidgets.QMessageBox.No:
+                return
+
         if caget(laser_PVs['ds_modulation_status']) == 0 or caget(laser_PVs['us_modulation_status']) == 0:
             msg = QtWidgets.QMessageBox()
             msg.setText("One (or both) of the lasers are in CW mode.\nAre you sure you want to proceed?")
@@ -219,6 +228,15 @@ class PulsedHeatingController(QtCore.QObject):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
 
     def start_timing_btn_clicked(self):
+        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
+                        caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
+            retval = msg.exec_()
+            if retval == QtWidgets.QMessageBox.No:
+                return
+
         self.timing_adjusted = True
         old_num_pulses = caget(pulse_PVs['BNC_burst_count'])
         temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
