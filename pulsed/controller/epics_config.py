@@ -69,6 +69,8 @@ laser_PVs = {
     'us_emission_status': laser1_prefix + 'Emission',
     'ds_laser_power_supply': laser2_prefix + 'PowerSupply',
     'us_laser_power_supply': laser1_prefix + 'PowerSupply',
+    'ds_diode_current': laser2_prefix + 'DiodeCurrent',
+    'us_diode_current': laser1_prefix + 'DiodeCurrent',
 }
 
 laser_values = {

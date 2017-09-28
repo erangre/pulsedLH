@@ -45,6 +45,7 @@ class PulsedHeatingController(QtCore.QObject):
                           't_exp_time_per_frame', 'num_t_frames', 'num_t_accumulations', 'num_pulses', 'ds_percent',
                           'us_percent', 'pulse_width', 'shutter', 'manual_gate_delay']
         self.first_run = True
+        self.widget.manual_delay_step_size_1_btn.click()
 
     def prepare_connections(self):
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
@@ -301,6 +302,28 @@ class PulsedHeatingController(QtCore.QObject):
             value = caget(laser_PVs['us_laser_percent'])
         if value is not None:
             self.widget.us_percent_display_le.setText(str(round(value, 2)))
+
+    def ds_diode_current_changed(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['ds_diode_current'])
+        if value is not None:
+            if value > 0.01:
+                self.widget.ds_diode_current_lbl.setText('ON')
+                self.widget.ds_diode_current_lbl.setStyleSheet("background-color: Red;")
+            else:
+                self.widget.ds_diode_current_lbl.setText('Off')
+                self.widget.ds_diode_current_lbl.setStyleSheet("background-color: LightGreen;")
+
+    def us_diode_current_changed(self, value=None, char_value=None):
+        if value is None:
+            value = caget(laser_PVs['ds_diode_current'])
+        if value is not None:
+            if value > 0.01:
+                self.widget.us_diode_current_lbl.setText('ON')
+                self.widget.us_diode_current_lbl.setStyleSheet("background-color: Red;")
+            else:
+                self.widget.us_diode_current_lbl.setText('Off')
+                self.widget.us_diode_current_lbl.setStyleSheet("background-color: LightGreen;")
 
     def toggle_percent_and_timing_btns(self, toggle):
         self.widget.both_increase_percent_btn.setEnabled(toggle)

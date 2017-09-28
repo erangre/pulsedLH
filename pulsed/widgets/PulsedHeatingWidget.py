@@ -24,8 +24,10 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.measure_diffraction_cb = QtWidgets.QCheckBox('measure XRD?')
         self.ds_enable_pulses_cb = QtWidgets.QCheckBox('Enable?')
         self.us_enable_pulses_cb = QtWidgets.QCheckBox('Enable?')
-        self.ds_lbl = QtWidgets.QLabel('down-stream')
-        self.us_lbl = QtWidgets.QLabel('up-stream')
+        self.ds_lbl = QtWidgets.QLabel('Down-stream')
+        self.us_lbl = QtWidgets.QLabel('Up-stream')
+        self.ds_diode_current_lbl = QtWidgets.QLabel('Off')
+        self.us_diode_current_lbl = QtWidgets.QLabel('Off')
         self.ds_percent_display_le = QtWidgets.QLineEdit('0.0')
         self.us_percent_display_le = QtWidgets.QLineEdit('0.0')
         self.percent_lbl = QtWidgets.QLabel('%')
@@ -80,10 +82,12 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.zero_btn, 1, 5, 1, 1)
         self._grid_layout.addWidget(self.num_pulses_le, 1, 6, 1, 2)
         self._grid_layout.addWidget(self.both_increase_percent_btn, 2, 3, 1, 2)
+        self._grid_layout.addWidget(self.ds_lbl, 2, 0, 1, 2)
+        self._grid_layout.addWidget(self.us_lbl, 2, 6, 1, 2)
         self._grid_layout.addWidget(self.ds_enable_pulses_cb, 3, 0, 1, 1)
-        self._grid_layout.addWidget(self.ds_lbl, 3, 1, 1, 1)
+        self._grid_layout.addWidget(self.ds_diode_current_lbl, 3, 1, 1, 1)
         self._grid_layout.addWidget(self.laser_percent_tweak_le, 3, 3, 1, 2)
-        self._grid_layout.addWidget(self.us_lbl, 3, 6, 1, 1)
+        self._grid_layout.addWidget(self.us_diode_current_lbl, 3, 6, 1, 1)
         self._grid_layout.addWidget(self.us_enable_pulses_cb, 3, 7, 1, 1)
         self._grid_layout.addWidget(self.ds_decrease_percent_btn, 4, 0)
         self._grid_layout.addWidget(self.ds_increase_percent_btn, 4, 1)
@@ -124,13 +128,21 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
 
     def style_widgets(self):
         self.stop_pulse_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black;")
+        self.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black; background-color: pink;")
+        self.start_pulse_btn.setStyleSheet("background-color: LightGreen;")
+        self.start_timing_btn.setStyleSheet("background-color: LightBlue;")
         self.num_pulses_le.setEnabled(False)
         self.ds_enable_pulses_cb.setChecked(True)
         self.us_enable_pulses_cb.setChecked(True)
         self.laser_percent_tweak_le.setValidator(QtGui.QDoubleValidator())
         self.ds_lbl.setAlignment(QtCore.Qt.AlignCenter)
         self.us_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.ds_lbl.setStyleSheet("font: bold;")
+        self.us_lbl.setStyleSheet("font: bold;")
+        self.ds_diode_current_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.ds_diode_current_lbl.setStyleSheet("font: bold; background-color: LightGreen;")
+        self.us_diode_current_lbl.setAlignment(QtCore.Qt.AlignCenter)
+        self.us_diode_current_lbl.setStyleSheet("font: bold; background-color: LightGreen;")
         self.ds_percent_display_le.setEnabled(False)
         self.us_percent_display_le.setEnabled(False)
         self.ds_percent_display_le.setAlignment(QtCore.Qt.AlignCenter)
@@ -163,9 +175,20 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.multi_gate_widget.setVisible(False)
         self.multi_gate_toggle_btn.setCheckable(True)
         self.multi_gate_toggle_btn.setChecked(False)
+        self.manual_delay_step_size_0p1_btn.setCheckable(True)
+        self.manual_delay_step_size_1_btn.setCheckable(True)
+        self.manual_delay_step_size_0p001_btn.setCheckable(True)
+        self.manual_delay_step_size_0p01_btn.setCheckable(True)
 
     def set_tool_tips_for_widgets(self):
         self.num_pulses_le.setToolTip("To change # of pulses, go to the 'Configure' tab")
+        self.ds_us_manual_delay_sb.setToolTip("Change only when noticing US and DS are not timed together\nUncheck the "
+                                              "'Enable?' checkbox for each laser separately to test")
+        self.manual_delay_step_size_1_btn.setToolTip("Use to set step for 'Gate delay' and for 'DS-->US delay'")
+        self.manual_delay_step_size_0p01_btn.setToolTip("Use to set step for 'Gate delay' and for 'DS-->US delay'")
+        self.manual_delay_step_size_0p001_btn.setToolTip("Use to set step for 'Gate delay' and for 'DS-->US delay'")
+        self.manual_delay_step_size_0p1_btn.setToolTip("Use to set step for 'Gate delay' and for 'DS-->US delay'")
+        self.multi_gate_toggle_btn.setToolTip("Show multi-gate controls")
 
     def update_timing_labels(self, timings):
         self.ds_delay_le.setText(str(round(timings['delay_t1'] * 1E6, 3)))
@@ -188,3 +211,12 @@ class MultiGateWidget(QtWidgets.QGroupBox):
         self._main_layout.addStretch(1)
         self._main_layout.addWidget(self.run_multi_gate_btn)
         self.setLayout(self._main_layout)
+        self.set_tool_tips_for_widgets()
+        self.style_widgets()
+
+    def style_widgets(self):
+        self.run_multi_gate_btn.setStyleSheet("background-color: LightGreen;")
+
+    def set_tool_tips_for_widgets(self):
+        self.multi_gate_values_le.setToolTip("Input relative gate delays (comma separated)\nPress the 'Run Multi_Gate' "
+                                             "button when ready")

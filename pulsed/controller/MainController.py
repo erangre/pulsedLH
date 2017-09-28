@@ -92,6 +92,8 @@ class MainController(object):
         self.callbacks[laser_PVs['ds_laser_percent']] = self.pulsed_heating_controller.ds_laser_percent_changed
         self.callbacks[laser_PVs['us_laser_percent']] = self.pulsed_heating_controller.us_laser_percent_changed
         self.callbacks[pil3_PVs['trigger_mode']] = self.update_pil3_status
+        self.callbacks[laser_PVs['ds_diode_current']] = self.pulsed_heating_controller.ds_diode_current_changed
+        self.callbacks[laser_PVs['us_diode_current']] = self.pulsed_heating_controller.us_diode_current_changed
 
     def update_main_status(self, value=None, char_value=None):
         if value is None:
@@ -241,6 +243,12 @@ class MainController(object):
         self.pv_ds_laser_modulation.add_callback(self.pv_changed_value)
         self.pv_us_laser_modulation = PV(laser_PVs['us_modulation_status'])
         self.pv_us_laser_modulation.add_callback(self.pv_changed_value)
+
+        self.pv_ds_laser_current = PV(laser_PVs['ds_diode_current'])
+        self.pv_ds_laser_current.add_callback(self.pv_changed_value)
+
+        self.pv_us_laser_current = PV(laser_PVs['us_diode_current'])
+        self.pv_us_laser_current.add_callback(self.pv_changed_value)
 
         if self.pv_ds_laser_modulation.connected:
             self.num_of_pulsed_status_pvs += 1
