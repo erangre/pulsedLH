@@ -353,10 +353,13 @@ class PulsedHeatingController(QtCore.QObject):
             self.log_info['xrd_exp_time'] = 'N/A'
             self.log_info['xrd_file_name'] = 'N/A'
             self.log_info['xrd_file_path'] = 'N/A'
+            self.widget.last_xrd_file_le.setText('')
         else:
-            (xrd_path, xrd_file) = os.path.split(caget(pil3_PVs['file_name'], as_string=True))
+            full_file_name = caget(pil3_PVs['file_name'], as_string=True)
+            (xrd_path, xrd_file) = os.path.split(full_file_name)
             self.log_info['xrd_file_name'] = xrd_file
             self.log_info['xrd_file_path'] = xrd_path
+            self.widget.last_xrd_file_le.setText(full_file_name)
 
         if not temperature:
             self.log_info['num_t_frames'] = 'N/A'
@@ -364,10 +367,13 @@ class PulsedHeatingController(QtCore.QObject):
             self.log_info['t_exp_time_per_frame'] = 'N/A'
             self.log_info['t_file_name'] = 'N/A'
             self.log_info['t_file_path'] = 'N/A'
+            self.widget.last_t_file_le.setText('')
         else:
-            (t_path, t_file) = os.path.split(caget(lf_PVs['lf_full_file_name'], as_string=True))
+            full_file_name = caget(lf_PVs['lf_full_file_name'], as_string=True)
+            (t_path, t_file) = os.path.split(full_file_name)
             self.log_info['t_file_name'] = t_file
             self.log_info['t_file_path'] = t_path
+            self.widget.last_t_file_le.setText(full_file_name)
 
     def write_to_log_file(self):
         for item in self.log_order:

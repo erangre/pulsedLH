@@ -18,6 +18,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.start_pulse_btn = QtWidgets.QPushButton('Start')
         self.stop_pulse_btn = QtWidgets.QPushButton('Stop')
         self.start_timing_btn = QtWidgets.QPushButton('Adjustment')
+        self.num_pulses_lbl = QtWidgets.QLabel('# of Pulses:')
+        self.num_pulses_le = QtWidgets.QLineEdit()
         self.measure_temperature_cb = QtWidgets.QCheckBox('measure T?')
         self.measure_diffraction_cb = QtWidgets.QCheckBox('measure XRD?')
         self.ds_enable_pulses_cb = QtWidgets.QCheckBox('Enable?')
@@ -54,6 +56,11 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.collect_quenched_xrd_btn = QtWidgets.QPushButton('Collect quenched XRD')
         self.measure_t_background_btn = QtWidgets.QPushButton('Measure T BG')
 
+        self.last_xrd_file_lbl = QtWidgets.QLabel('Last XRD File:')
+        self.last_xrd_file_le = QtWidgets.QLineEdit()
+        self.last_t_file_lbl = QtWidgets.QLabel('Last T File:')
+        self.last_t_file_le = QtWidgets.QLineEdit()
+
         self.multi_gate_toggle_btn = QtWidgets.QPushButton('Multi-Gate')
 
         self.multi_gate_widget = MultiGateWidget()
@@ -68,8 +75,10 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.start_timing_btn, 0, 2, 1, 1)
         self._grid_layout.addWidget(self.stop_pulse_btn, 0, 3, 2, 2)
         self._grid_layout.addWidget(self.start_pulse_btn, 0, 5, 1, 1)
+        self._grid_layout.addWidget(self.num_pulses_lbl, 0, 6, 1, 1)
         self._grid_layout.addWidget(self.ten_percent_btn, 1, 2, 1, 1)
         self._grid_layout.addWidget(self.zero_btn, 1, 5, 1, 1)
+        self._grid_layout.addWidget(self.num_pulses_le, 1, 6, 1, 2)
         self._grid_layout.addWidget(self.both_increase_percent_btn, 2, 3, 1, 2)
         self._grid_layout.addWidget(self.ds_enable_pulses_cb, 3, 0, 1, 1)
         self._grid_layout.addWidget(self.ds_lbl, 3, 1, 1, 1)
@@ -102,15 +111,21 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.measure_diffraction_cb, 9, 1, 1, 1)
         self._grid_layout.addWidget(self.collect_quenched_xrd_btn, 9, 2, 1, 2)
         self._grid_layout.addWidget(self.measure_t_background_btn, 9, 4, 1, 2)
-        self._grid_layout.addWidget(self.multi_gate_toggle_btn, 10, 0, 1, 1)
+        self._grid_layout.addWidget(self.last_xrd_file_lbl, 10, 0, 1, 1)
+        self._grid_layout.addWidget(self.last_xrd_file_le, 10, 1, 1, 3)
+        self._grid_layout.addWidget(self.last_t_file_lbl, 10, 4, 1, 1)
+        self._grid_layout.addWidget(self.last_t_file_le, 10, 5, 1, 3)
+        self._grid_layout.addWidget(self.multi_gate_toggle_btn, 11, 0, 1, 1)
 
         self.setLayout(self._layout)
 
         self.style_widgets()
+        self.set_tool_tips_for_widgets()
 
     def style_widgets(self):
         self.stop_pulse_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black;")
+        self.num_pulses_le.setEnabled(False)
         self.ds_enable_pulses_cb.setChecked(True)
         self.us_enable_pulses_cb.setChecked(True)
         self.laser_percent_tweak_le.setValidator(QtGui.QDoubleValidator())
@@ -143,9 +158,14 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.gate_manual_delay_sb.setDecimals(3)
         self.measure_temperature_cb.setChecked(True)
         self.measure_diffraction_cb.setChecked(True)
+        self.last_xrd_file_le.setEnabled(False)
+        self.last_t_file_le.setEnabled(False)
         self.multi_gate_widget.setVisible(False)
         self.multi_gate_toggle_btn.setCheckable(True)
         self.multi_gate_toggle_btn.setChecked(False)
+
+    def set_tool_tips_for_widgets(self):
+        self.num_pulses_le.setToolTip("To change # of pulses, go to the 'Configure' tab")
 
     def update_timing_labels(self, timings):
         self.ds_delay_le.setText(str(round(timings['delay_t1'] * 1E6, 3)))
