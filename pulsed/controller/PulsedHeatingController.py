@@ -145,7 +145,8 @@ class PulsedHeatingController(QtCore.QObject):
         if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
                         caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
             msg = QtWidgets.QMessageBox()
-            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?")
+            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?\nTo fix, turn on "
+                        "emission on the control box near the main control computer")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
@@ -153,7 +154,8 @@ class PulsedHeatingController(QtCore.QObject):
 
         if caget(laser_PVs['ds_modulation_status']) == 0 or caget(laser_PVs['us_modulation_status']) == 0:
             msg = QtWidgets.QMessageBox()
-            msg.setText("One (or both) of the lasers are in CW mode.\nAre you sure you want to proceed?")
+            msg.setText("One (or both) of the lasers are in CW mode.\nAre you sure you want to proceed?\nTo fix, go to "
+                        "the 'Switch Modes' tab.")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
@@ -161,7 +163,8 @@ class PulsedHeatingController(QtCore.QObject):
 
         if not self.timing_adjusted:
             msg = QtWidgets.QMessageBox()
-            msg.setText("Laser timing was not adjusted to current laser power.\nAre you sure you want to proceed?")
+            msg.setText("Laser timing was not adjusted to current laser power.\nAre you sure you want to proceed?\nTo "
+                        "fix, press the 'Adjustment' button")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
@@ -190,7 +193,8 @@ class PulsedHeatingController(QtCore.QObject):
         if self.widget.measure_temperature_cb.isChecked():
             if self.bg_collected_for is None or not caget(lf_PVs['lf_get_accs']) == self.bg_collected_for:
                 msg = QtWidgets.QMessageBox()
-                msg.setText("No BG collected for current T accumulations.\nAre you sure you want to proceed?")
+                msg.setText("No BG collected for current T accumulations.\nAre you sure you want to proceed?\nTo fix, "
+                            "press the 'Measure T BG' button")
                 msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
                 retval = msg.exec_()
                 if retval == QtWidgets.QMessageBox.No:
@@ -231,7 +235,8 @@ class PulsedHeatingController(QtCore.QObject):
         if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
                         caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
             msg = QtWidgets.QMessageBox()
-            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?")
+            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?\nTo fix, turn on "
+                        "emission on the control box near the main control computer")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
