@@ -12,6 +12,8 @@ class ConfigWidget(QtWidgets.QGroupBox):
 
         self.num_pulses_lbl = QtWidgets.QLabel('# of Pulses:')
         self.num_pulses_sb = QtWidgets.QSpinBox()
+        self.pulse_width_lbl = QtWidgets.QLabel('Pulse width (us):')
+        self.pulse_width_le = QtWidgets.QLineEdit('1')
         self.pimax_max_num_accs_lbl = QtWidgets.QLabel('Max # of PIMAX Accumulations:')
         self.pimax_max_num_accs_sb = QtWidgets.QSpinBox()
         self.pimax_max_num_frames_lbl = QtWidgets.QLabel('Max # of PIMAX Frames:')
@@ -23,6 +25,8 @@ class ConfigWidget(QtWidgets.QGroupBox):
 
         self._grid_layout.addWidget(self.num_pulses_lbl, 0, 0, 1, 1)
         self._grid_layout.addWidget(self.num_pulses_sb, 0, 1, 1, 1)
+        self._grid_layout.addWidget(self.pulse_width_lbl, 0, 2, 1, 1)
+        self._grid_layout.addWidget(self.pulse_width_le, 0, 3, 1, 1)
         self._grid_layout.addWidget(self.pimax_max_num_accs_lbl, 1, 0, 1, 1)
         self._grid_layout.addWidget(self.pimax_max_num_accs_sb, 1, 1, 1, 1)
         self._grid_layout.addWidget(self.pimax_max_num_frames_lbl, 1, 2, 1, 1)

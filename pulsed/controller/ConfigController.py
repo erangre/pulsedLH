@@ -43,6 +43,7 @@ class ConfigController(object):
         self.widget.pimax_max_num_accs_sb.valueChanged.connect(self.pimax_max_num_accs_sb_changed)
         self.widget.pimax_max_num_frames_sb.valueChanged.connect(self.pimax_max_num_frames_sb_changed)
         self.widget.choose_log_path_btn.clicked.connect(self.choose_log_path_btn_clicked)
+        self.widget.pulse_width_le.editingFinished.connect(self.pulse_width_le_changed)
 
     def set_startup_values(self):
         self.widget.log_path_le.setText(DEFAULT_LOG_FILE)
@@ -52,9 +53,11 @@ class ConfigController(object):
         caput(pulse_PVs['BNC_burst_count'], DEFAULT_NUM_PULSES * PULSE_FACTOR)
         accs, frames = self.model.calc_frames_and_accs(DEFAULT_NUM_PULSES, DEFAULT_MAX_NUM_PIMAX_ACCS, PIMAX_FACTOR,
                                                        DEFAULT_MAX_NUM_PIMAX_FRAMES)
-        caput_lf(lf_PVs['lf_set_accs'], accs)
-        caput_lf(lf_PVs['lf_set_frames'], frames)
-        caput(pil3_PVs['exposures_per_image'], DEFAULT_NUM_PULSES)
+        # if self.main_widget.pimax_status.text() == PIMAX_STATUS_PULSED:
+        #     caput_lf(lf_PVs['lf_set_accs'], accs)
+        #     caput_lf(lf_PVs['lf_set_frames'], frames)
+        # if self.main_widget.pil3_status.text() == PIL3_STATUS_PULSED:
+        #     caput(pil3_PVs['exposures_per_image'], DEFAULT_NUM_PULSES)
         self.main_widget.pulsed_laser_heating_widget.num_pulses_le.setText(str(DEFAULT_NUM_PULSES))
 
     def num_pulses_sb_changed(self):
@@ -100,3 +103,7 @@ class ConfigController(object):
         self.widget.log_path_le.setEnabled(toggle)
         self.widget.choose_log_path_btn.setEnabled(toggle)
         QtWidgets.QApplication.processEvents()
+
+    def pulse_width_le_changed(self):
+        pulse_width = float(self.widget.pulse_width_le.text())*1E-6
+        caput(pulse_PVs['BNC_T4_width'], pulse_width)

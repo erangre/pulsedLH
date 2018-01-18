@@ -145,12 +145,12 @@ class ModeSwitchController(QtCore.QObject):
         caput_pil3(pil3_PVs['trigger_mode'], pil3_values['trigger_external_enable'])
         num_pulses = self.widget.config_widget.num_pulses_sb.value()
         caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
         caput_pil3(pil3_PVs['exposure_time'], 1E-6)  # TODO - read this from config tab
-        caput_pil3(pil3_PVs['threshold_apply'], 1)
-        caput_pil3(pil3_PVs['threshold_apply'], 1)
         caput_pil3(pil3_PVs['threshold_apply'], 1)
         caput_pil3(general_PVs['pilatus_gate_control'], general_values['pilatus_gate_control_BNC'])
         self.widget.main_status.setText(self.previous_status)
+        caput_pil3(pil3_PVs['threshold_apply'], 1)
 
     def pil3_to_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching Pilatus to normal mode. Please Wait')

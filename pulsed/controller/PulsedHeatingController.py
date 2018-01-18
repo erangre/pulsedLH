@@ -171,11 +171,14 @@ class PulsedHeatingController(QtCore.QObject):
             if retval == QtWidgets.QMessageBox.No:
                 return
 
+        self.toggle_pulse_control_btns(False)
+
         self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
         if self.first_run:
             self.write_headings()
             self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_clear'], wait=True)
+        time.sleep(1.0)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         manual_gate_delay = self.widget.gate_manual_delay_sb.value()
         for gate_delay in gate_delays:
@@ -184,9 +187,12 @@ class PulsedHeatingController(QtCore.QObject):
             except ValueError:
                 continue
             self.start_pulses_for_single_gate_delay(delay + manual_gate_delay)
+            print("collected at ", delay, " us delay")
+            time.sleep(1.0)
 
         self.widget.gate_manual_delay_sb.setValue(manual_gate_delay)
         self.log_file.close()
+        self.toggle_pulse_control_btns(True)
 
     def start_pulses_for_single_gate_delay(self, gate_delay):
         self.widget.gate_manual_delay_sb.setValue(gate_delay)
@@ -231,8 +237,10 @@ class PulsedHeatingController(QtCore.QObject):
 
     def stop_pulse_btn_clicked(self):
         caput(pulse_PVs['BNC_run'], pulse_values['BNC_STOPPED'], wait=True)
+        self.toggle_pulse_control_btns(True)
 
     def start_timing_btn_clicked(self):
+        self.toggle_pulse_control_btns(False)
         if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
                         caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
             msg = QtWidgets.QMessageBox()
@@ -248,6 +256,7 @@ class PulsedHeatingController(QtCore.QObject):
         temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
         caput_lf(pulse_PVs['BNC_burst_count'], temp_num_pulses)
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        time.sleep(1.0)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
 
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
@@ -262,6 +271,8 @@ class PulsedHeatingController(QtCore.QObject):
 
         caput_lf(pulse_PVs['BNC_burst_count'], old_num_pulses)
 
+        self.toggle_pulse_control_btns(True)
+
     def update_bnc_timings(self):
         self.timing_adjusted = False
         self.toggle_percent_and_timing_btns(False)
@@ -271,7 +282,7 @@ class PulsedHeatingController(QtCore.QObject):
             f = 1.0/period
         else:
             f = 1E4
-        w = 1.0  # TODO change this to read from settings the pulse width
+        w = float(self.main_widget.config_widget.pulse_width_le.text())
         ds_percent = caget(laser_PVs['ds_laser_percent'], as_string=False)
         us_percent = caget(laser_PVs['us_laser_percent'], as_string=False)
         ds_us_manual_delay = self.widget.ds_us_manual_delay_sb.value()
@@ -334,6 +345,13 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.us_decrease_percent_btn.setEnabled(toggle)
         self.widget.ds_us_manual_delay_sb.setEnabled(toggle)
         self.widget.gate_manual_delay_sb.setEnabled(toggle)
+
+    def toggle_pulse_control_btns(self, toggle):
+        self.widget.start_timing_btn.setEnabled(toggle)
+        self.widget.start_pulse_btn.setEnabled(toggle)
+        self.widget.collect_quenched_xrd_btn.setEnabled(toggle)
+        self.widget.measure_t_background_btn.setEnabled(toggle)
+        self.widget.multi_gate_widget.run_multi_gate_btn.setEnabled(toggle)
 
     def ds_us_manual_delay_changed(self):
         self.update_bnc_timings()
@@ -415,12 +433,15 @@ class PulsedHeatingController(QtCore.QObject):
             time.sleep(0.1)
 
     def collect_quenched_xrd_btn_clicked(self):
+        self.toggle_pulse_control_btns(False)
+
         self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
 
         if self.first_run:
             self.write_headings()
             self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        time.sleep(1.0)
         caput(pil3_PVs['Acquire'], 1, wait=False)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
         self.collect_info_for_log()
@@ -435,8 +456,11 @@ class PulsedHeatingController(QtCore.QObject):
         self.collect_xrd_and_t_info_for_log(xrd=True, temperature=False)
         self.write_to_log_file()
         self.log_file.close()
+        self.toggle_pulse_control_btns(True)
 
     def measure_t_background_btn_clicked(self):
+        self.toggle_pulse_control_btns(False)
+
         lf_experiment = caget(lf_PVs['lf_get_experiment'], as_string=True)
         if lf_experiment == lf_values['PIMAX_normal']:
             return
@@ -456,11 +480,13 @@ class PulsedHeatingController(QtCore.QObject):
         caput(general_PVs['us_light_control'], general_values['light_off'])
 
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
+        time.sleep(1.0)
         caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_internal'])
         caput_lf(lf_PVs['lf_set_internal_trigger_freq'], 1E4)
         caput_lf(lf_PVs['lf_set_frames'], 1)
         caput_lf(lf_PVs['lf_set_image_mode'], lf_values['lf_image_mode_background'])
         caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_pulsed_bg_file_name'])
+        QtWidgets.QApplication.processEvents()
         caput_lf(lf_PVs['lf_acquire'], 1, wait=True)
         caput_lf(lf_PVs['lf_set_trigger_mode'], lf_values['PIMAX_trigger_external'])
         caput_lf(lf_PVs['lf_set_image_mode'], lf_values['lf_image_mode_normal'])
@@ -472,6 +498,7 @@ class PulsedHeatingController(QtCore.QObject):
             else:
                 caput(item, previous_settings[item], wait=True)
         self.bg_collected_for = caget(lf_PVs['lf_get_accs'])
+        self.toggle_pulse_control_btns(True)
 
     def multi_gate_toggle_btn_clicked(self):
         self.widget.multi_gate_widget.setVisible(not(self.widget.multi_gate_widget.isVisible()))
