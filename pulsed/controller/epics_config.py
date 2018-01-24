@@ -102,6 +102,7 @@ lf_PVs = {
     'lf_set_image_mode': lf_prefix + 'ImageMode',
     'lf_get_image_mode': lf_prefix + 'ImageMode_RBV',
     'lf_set_internal_trigger_freq': lf_prefix + 'LFTriggerFrequency',
+    'lf_gate_width': lf_prefix + 'LFRepGateWidth',
 }
 
 lf_values = {

@@ -6,7 +6,7 @@ class WidthDelayModel(object):
     def __init__(self):
         pass
 
-    def calc_all_delays_and_widths(self, f=10000, w=1.0, ds_percent=0.0, us_percent=0.0, ds_us_manual_delay =0.0,
+    def calc_all_delays_and_widths(self, f=10000, w=1.0, ds_percent=0.0, us_percent=0.0, ds_us_manual_delay=0.0,
                                    gate_manual_delay=0.0):
         timings = {}
         if ds_percent < 10.0:

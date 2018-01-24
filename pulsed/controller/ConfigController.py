@@ -107,3 +107,4 @@ class ConfigController(object):
     def pulse_width_le_changed(self):
         pulse_width = float(self.widget.pulse_width_le.text())*1E-6
         caput(pulse_PVs['BNC_T4_width'], pulse_width)
+        caput_lf(lf_PVs['lf_gate_width'], pulse_width)

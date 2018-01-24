@@ -197,6 +197,8 @@ class PulsedHeatingController(QtCore.QObject):
     def start_pulses_for_single_gate_delay(self, gate_delay):
         self.widget.gate_manual_delay_sb.setValue(gate_delay)
         self.collect_info_for_log()
+
+        time.sleep(0.1)
         if self.widget.measure_temperature_cb.isChecked():
             if self.bg_collected_for is None or not caget(lf_PVs['lf_get_accs']) == self.bg_collected_for:
                 msg = QtWidgets.QMessageBox()
@@ -210,12 +212,15 @@ class PulsedHeatingController(QtCore.QObject):
             t_toggle = True
         else:
             t_toggle = False
+
+        time.sleep(0.1)
         if self.widget.measure_diffraction_cb.isChecked():
             caput(pil3_PVs['Acquire'], 1, wait=False)
             xrd_toggle = True
         else:
             xrd_toggle = False
 
+        time.sleep(0.1)
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
         bnc_run_thread.start()
         self.widget.stop_pulse_btn.setStyleSheet("font: bold 16px; color: red;")
@@ -240,7 +245,6 @@ class PulsedHeatingController(QtCore.QObject):
         self.toggle_pulse_control_btns(True)
 
     def start_timing_btn_clicked(self):
-        self.toggle_pulse_control_btns(False)
         if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
                         caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
             msg = QtWidgets.QMessageBox()
@@ -251,7 +255,9 @@ class PulsedHeatingController(QtCore.QObject):
             if retval == QtWidgets.QMessageBox.No:
                 return
 
+        self.toggle_pulse_control_btns(False)
         self.timing_adjusted = True
+        
         old_num_pulses = caget(pulse_PVs['BNC_burst_count'])
         temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
         caput_lf(pulse_PVs['BNC_burst_count'], temp_num_pulses)
@@ -373,8 +379,8 @@ class PulsedHeatingController(QtCore.QObject):
 
     def collect_info_for_log(self):
         self.log_info['date_time'] = time.asctime().replace(' ', '_')
-        self.log_info['ds_percent'] = caget(laser_PVs['ds_laser_percent'])
-        self.log_info['us_percent'] = caget(laser_PVs['us_laser_percent'])
+        self.log_info['ds_percent'] = '{0:.2f}'.format(caget(laser_PVs['ds_laser_percent']))
+        self.log_info['us_percent'] = '{0:.2f}'.format(caget(laser_PVs['us_laser_percent']))
         self.log_info['num_pulses'] = self.main_widget.config_widget.num_pulses_sb.value()
         self.log_info['pulse_width'] = caget(pulse_PVs['BNC_T4_width'])
         self.log_info['ds_delay'] = caget(pulse_PVs['BNC_T1_delay'])
@@ -385,9 +391,11 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['us_width'] = caget(pulse_PVs['BNC_T2_delay'])
         self.log_info['num_t_frames'] = caget(lf_PVs['lf_get_frames'])
         self.log_info['num_t_accumulations'] = caget(lf_PVs['lf_get_accs'])
-        self.log_info['t_exp_time_per_frame'] = self.log_info['pulse_width'] * self.log_info['num_t_accumulations']
+        self.log_info['t_exp_time_per_frame'] = '{0:.6f}'.format(self.log_info['pulse_width'] *
+                                                                 self.log_info['num_t_accumulations'])
         self.log_info['shutter'] = caget(general_PVs['laser_shutter_status'])
-        self.log_info['xrd_exp_time'] = self.log_info['pulse_width'] * caget(pil3_PVs['exposures_per_image'])
+        self.log_info['xrd_exp_time'] = '{0:.4f}'.format(self.log_info['pulse_width'] *
+                                                         caget(pil3_PVs['exposures_per_image']))
 
     def collect_xrd_and_t_info_for_log(self, xrd=False, temperature=False):
         if not xrd:
