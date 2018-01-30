@@ -22,6 +22,7 @@ class PulsedHeatingController(QtCore.QObject):
 
     pulse_changed = QtCore.Signal()
     pulse_running = QtCore.Signal(bool)
+    prepare_pulses = QtCore.Signal()
 
     def __init__(self, widget):
         """
@@ -36,6 +37,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.laser_percent_tweak_le_editing_finished()
         self.ds_laser_percent_changed()
         self.us_laser_percent_changed()
+        self.update_alignment_slides_status()
         self.manual_delay = 1.0
         self.update_bnc_timings()
         self.log_info = {}
@@ -138,6 +140,8 @@ class PulsedHeatingController(QtCore.QObject):
         self.pulse_changed.emit()
 
     def start_pulse_btn_clicked(self, **kwargs):
+        self.prepare_pulses.emit()
+
         gate_delays = kwargs.get('gate_delays', None)
 
         if gate_delays is None:
@@ -172,6 +176,20 @@ class PulsedHeatingController(QtCore.QObject):
                 return
 
         self.toggle_pulse_control_btns(False)
+
+        if self.widget.force_alignment_slides_in_cb.isChecked():
+            self.main_widget.main_status.setText("Moving in alignment slides...")
+            QtWidgets.QApplication.processEvents()
+            caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_in'])
+            time.sleep(1)
+            self.update_alignment_slides_status()
+        else:
+            if caget(general_PVs['laser_glass_slides_status']) == general_values['laser_glass_slides_in']:
+                self.main_widget.main_status.setText("Moving out alignment slides...")
+                QtWidgets.QApplication.processEvents()
+                caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_out'])
+                time.sleep(3)
+                self.update_alignment_slides_status()
 
         self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
         if self.first_run:
@@ -245,6 +263,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.toggle_pulse_control_btns(True)
 
     def start_timing_btn_clicked(self):
+        self.prepare_pulses.emit()
         if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
                         caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
             msg = QtWidgets.QMessageBox()
@@ -257,7 +276,14 @@ class PulsedHeatingController(QtCore.QObject):
 
         self.toggle_pulse_control_btns(False)
         self.timing_adjusted = True
-        
+
+        if caget(general_PVs['laser_glass_slides_status']) == general_values['laser_glass_slides_out']:
+            self.main_widget.main_status.setText("Moving in alignment slides...")
+            QtWidgets.QApplication.processEvents()
+            caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_in'])
+            time.sleep(1)
+            self.update_alignment_slides_status()
+
         old_num_pulses = caget(pulse_PVs['BNC_burst_count'])
         temp_num_pulses = 20.0 / caget(pulse_PVs['BNC_period'])
         caput_lf(pulse_PVs['BNC_burst_count'], temp_num_pulses)
@@ -441,6 +467,7 @@ class PulsedHeatingController(QtCore.QObject):
             time.sleep(0.1)
 
     def collect_quenched_xrd_btn_clicked(self):
+        self.prepare_pulses.emit()
         self.toggle_pulse_control_btns(False)
 
         self.log_file = open(self.main_widget.config_widget.log_path_le.text(), 'a')
@@ -467,6 +494,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.toggle_pulse_control_btns(True)
 
     def measure_t_background_btn_clicked(self):
+        self.prepare_pulses.emit()
         self.toggle_pulse_control_btns(False)
 
         lf_experiment = caget(lf_PVs['lf_get_experiment'], as_string=True)
@@ -514,3 +542,11 @@ class PulsedHeatingController(QtCore.QObject):
     def run_multi_gate_btn_clicked(self):
         gate_delays = self.widget.multi_gate_widget.multi_gate_values_le.text().replace(' ', '').split(',')
         self.start_pulse_btn_clicked(gate_delays=gate_delays)
+
+    def update_alignment_slides_status(self):
+        if caget(general_PVs['laser_glass_slides_status']) == general_values['laser_glass_slides_in']:
+            self.widget.alignment_slides_status_lbl.setText("Slides In")
+            self.widget.alignment_slides_status_lbl.setStyleSheet("color: Blue;")
+        else:
+            self.widget.alignment_slides_status_lbl.setText("Slides Out")
+            self.widget.alignment_slides_status_lbl.setStyleSheet("color: Red;")

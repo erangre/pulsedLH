@@ -17,6 +17,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.both_decrease_percent_btn = QtWidgets.QPushButton('\u25bc')
         self.start_pulse_btn = QtWidgets.QPushButton('Start')
         self.stop_pulse_btn = QtWidgets.QPushButton('Stop')
+        self.force_alignment_slides_in_cb = QtWidgets.QCheckBox('Force Slides In')
+        self.alignment_slides_status_lbl = QtWidgets.QLabel('Slides')
         self.start_timing_btn = QtWidgets.QPushButton('Adjustment')
         self.num_pulses_lbl = QtWidgets.QLabel('# of Pulses:')
         self.num_pulses_le = QtWidgets.QLineEdit()
@@ -74,6 +76,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._layout.addLayout(self._grid_layout)
         self._layout.addWidget(self.multi_gate_widget)
 
+        self._grid_layout.addWidget(self.force_alignment_slides_in_cb, 0, 0, 1, 1)
+        self._grid_layout.addWidget(self.alignment_slides_status_lbl, 0, 1, 1, 1)
         self._grid_layout.addWidget(self.start_timing_btn, 0, 2, 1, 1)
         self._grid_layout.addWidget(self.stop_pulse_btn, 0, 3, 2, 2)
         self._grid_layout.addWidget(self.start_pulse_btn, 0, 5, 1, 1)
@@ -129,7 +133,9 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
     def style_widgets(self):
         self.stop_pulse_btn.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
         self.stop_pulse_btn.setStyleSheet("font: bold 16px; color: black; background-color: pink;")
+
         self.start_pulse_btn.setStyleSheet("background-color: LightGreen;")
+        self.alignment_slides_status_lbl.setStyleSheet("color: LightBlue;")
         self.start_timing_btn.setStyleSheet("background-color: LightBlue;")
         self.num_pulses_le.setEnabled(False)
         self.ds_enable_pulses_cb.setChecked(True)
@@ -181,6 +187,9 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.manual_delay_step_size_0p01_btn.setCheckable(True)
 
     def set_tool_tips_for_widgets(self):
+        self.force_alignment_slides_in_cb.setToolTip("When checked, glass alignment slides will remain in during "
+                                                     "pulsed heating")
+        self.alignment_slides_status_lbl.setToolTip("Glass slides for timing the lasers to the gate")
         self.num_pulses_le.setToolTip("To change # of pulses, go to the 'Configure' tab")
         self.ds_us_manual_delay_sb.setToolTip("Change only when noticing US and DS are not timed together\nUncheck the "
                                               "'Enable?' checkbox for each laser separately to test")
