@@ -44,6 +44,7 @@ class ConfigController(object):
         self.widget.pimax_max_num_frames_sb.valueChanged.connect(self.pimax_max_num_frames_sb_changed)
         self.widget.choose_log_path_btn.clicked.connect(self.choose_log_path_btn_clicked)
         self.widget.pulse_width_le.editingFinished.connect(self.pulse_width_le_changed)
+        self.widget.pimax_gate_width_le.editingFinished.connect(self.pimax_gate_changed)
 
     def set_startup_values(self):
         self.widget.log_path_le.setText(DEFAULT_LOG_FILE)
@@ -63,8 +64,10 @@ class ConfigController(object):
     def num_pulses_sb_changed(self):
         num_pulses = self.widget.num_pulses_sb.value()
         caput(pulse_PVs['BNC_burst_count'], num_pulses * PULSE_FACTOR)
-        self.update_lf_settings(num_pulses)
-        caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
+        if caget(lf_PVs['lf_get_trigger_mode']) == lf_values['PIMAX_trigger_external']:
+            self.update_lf_settings(num_pulses)
+        if caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_external_enable']:
+            caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
         self.main_widget.pulsed_laser_heating_widget.num_pulses_le.setText(str(num_pulses))
 
     def pimax_max_num_accs_sb_changed(self):
@@ -86,6 +89,7 @@ class ConfigController(object):
         accs, frames = self.model.calc_frames_and_accs(num_pulses, max_accs, PIMAX_FACTOR, max_frames)
         caput_lf(lf_PVs['lf_set_accs'], accs)
         caput_lf(lf_PVs['lf_set_frames'], frames)
+        self.widget.pimax_num_frames_le.setText(str(frames))
         # self.toggle_config_btns(True)
 
     def choose_log_path_btn_clicked(self):
@@ -107,4 +111,8 @@ class ConfigController(object):
     def pulse_width_le_changed(self):
         pulse_width = float(self.widget.pulse_width_le.text())*1E-6
         caput(pulse_PVs['BNC_T4_width'], pulse_width)
-        caput_lf(lf_PVs['lf_gate_width'], pulse_width)
+        # caput_lf(lf_PVs['lf_gate_width'], pulse_width)
+
+    def pimax_gate_changed(self):
+        gate_width = float(self.widget.pimax_gate_width_le.text()) * 1E-6
+        caput_lf(lf_PVs['lf_gate_width'], gate_width)

@@ -34,7 +34,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.main_widget = widget
         self.model = WidthDelayModel()
         self.prepare_connections()
-        self.laser_percent_tweak_le_editing_finished()
+        # self.laser_percent_tweak_le_editing_finished()
         self.ds_laser_percent_changed()
         self.us_laser_percent_changed()
         self.update_alignment_slides_status()
@@ -147,11 +147,13 @@ class PulsedHeatingController(QtCore.QObject):
         if gate_delays is None:
             gate_delays = [0]
 
-        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
-                        caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+        if (caget(pulse_PVs['BNC_T1_enable']) == pulse_values['BNC_ENABLE'] and
+                caget(laser_PVs['ds_emission_status']) == laser_values['emission_off']) or \
+                (caget(pulse_PVs['BNC_T2_enable']) == pulse_values['BNC_ENABLE'] and
+                 caget(laser_PVs['us_emission_status']) == laser_values['emission_off']):
             msg = QtWidgets.QMessageBox()
-            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?\nTo fix, turn on "
-                        "emission on the control box near the main control computer")
+            msg.setText("Emission is off for one or more enabled lasers\nAre you sure you want to proceed?\nTo fix, "
+                        "turn on emission on the control box near the main control computer")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
@@ -264,11 +266,13 @@ class PulsedHeatingController(QtCore.QObject):
 
     def start_timing_btn_clicked(self):
         self.prepare_pulses.emit()
-        if caget(laser_PVs['ds_emission_status']) == laser_values['emission_off'] or \
-                        caget(laser_PVs['us_emission_status']) == laser_values['emission_off']:
+        if (caget(pulse_PVs['BNC_T1_enable']) == pulse_values['BNC_ENABLE'] and
+                caget(laser_PVs['ds_emission_status']) == laser_values['emission_off']) or \
+                (caget(pulse_PVs['BNC_T2_enable']) == pulse_values['BNC_ENABLE'] and
+                 caget(laser_PVs['us_emission_status']) == laser_values['emission_off']):
             msg = QtWidgets.QMessageBox()
-            msg.setText("Emission is off for one or more lasers\nAre you sure you want to proceed?\nTo fix, turn on "
-                        "emission on the control box near the main control computer")
+            msg.setText("Emission is off for one or more enabled lasers\nAre you sure you want to proceed?\nTo fix, "
+                        "turn on emission on the control box near the main control computer")
             msg.setStandardButtons(QtWidgets.QMessageBox.Yes | QtWidgets.QMessageBox.No)
             retval = msg.exec_()
             if retval == QtWidgets.QMessageBox.No:
@@ -409,6 +413,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['us_percent'] = '{0:.2f}'.format(caget(laser_PVs['us_laser_percent']))
         self.log_info['num_pulses'] = self.main_widget.config_widget.num_pulses_sb.value()
         self.log_info['pulse_width'] = caget(pulse_PVs['BNC_T4_width'])
+        self.log_info['pimax_gate_width'] = caget(lf_PVs['lf_gate_width'])
         self.log_info['ds_delay'] = caget(pulse_PVs['BNC_T1_delay'])
         self.log_info['us_delay'] = caget(pulse_PVs['BNC_T2_delay'])
         self.log_info['total_gate_delay'] = caget(pulse_PVs['BNC_T4_delay'])

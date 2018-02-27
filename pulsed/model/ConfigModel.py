@@ -11,6 +11,8 @@ class ConfigModel(object):
             return pulses, 1
 
         frames = floor(pulses * factor / max_accs)
+        if frames == 0:
+            frames = 1
         if frames > max_frames:
             return max_accs, max_frames
         return max_accs, frames

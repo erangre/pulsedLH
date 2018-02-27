@@ -60,6 +60,7 @@ class ModeSwitchController(QtCore.QObject):
     def ds_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching DS laser to normal mode. Please Wait')
         t0 = time.time()
+        caput(laser_PVs['ds_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['ds_disable_modulation'], 1, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
@@ -90,6 +91,7 @@ class ModeSwitchController(QtCore.QObject):
     def us_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching US laser to normal mode. Please Wait')
         t0 = time.time()
+        caput(laser_PVs['us_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['us_disable_modulation'], 1, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
