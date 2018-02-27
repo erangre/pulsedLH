@@ -50,6 +50,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.manual_delay_step_size_1_btn.click()
 
     def prepare_connections(self):
+        self.widget.toggle_alignment_slides_status_btn.clicked.connect(self.toggle_alignment_slides_btn_clicked)
         self.widget.ten_percent_btn.clicked.connect(self.ten_percent_btn_clicked)
         self.widget.zero_btn.clicked.connect(self.zero_btn_clicked)
         self.widget.ds_enable_pulses_cb.stateChanged.connect(self.ds_enable_pulses_cb_changed)
@@ -555,3 +556,11 @@ class PulsedHeatingController(QtCore.QObject):
         else:
             self.widget.alignment_slides_status_lbl.setText("Slides Out")
             self.widget.alignment_slides_status_lbl.setStyleSheet("color: Red;")
+
+    def toggle_alignment_slides_btn_clicked(self):
+        if caget(general_PVs['laser_glass_slides_status']) == general_values['laser_glass_slides_in']:
+            caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_out'], wait=True)
+        else:
+            caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_in'], wait=True)
+        time.sleep(0.2)
+        self.update_alignment_slides_status()
