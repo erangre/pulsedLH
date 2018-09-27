@@ -42,7 +42,7 @@ class PulsedHeatingControllerTest(QtTest):
     def test_set_number_of_pulses(self):
         self.assertEqual(self.widget.num_pulses_sb.value(), DEFAULT_NUM_PULSES)
         accs, frames = self.model.calc_frames_and_accs(DEFAULT_NUM_PULSES, DEFAULT_MAX_NUM_PIMAX_ACCS, PIMAX_FACTOR,
-                                                       DEFAULT_MAX_NUM_PIMAX_FRAMES)
+                                                       DEFAULT_MAX_NUM_PIMAX_FRAMES, DEFAULT_PULSE_FREQ)
         self.assertEqual(caget(lf_PVs['lf_get_accs']), accs)
         self.assertEqual(caget(lf_PVs['lf_get_frames']), frames)
         self.assertEqual(caget(pil3_PVs['exposures_per_image']), DEFAULT_NUM_PULSES)
@@ -57,7 +57,7 @@ class PulsedHeatingControllerTest(QtTest):
         self.assertEqual(caget(pulse_PVs['BNC_burst_count']), num_pulses * PULSE_FACTOR)
         self.assertEqual(caget(pil3_PVs['exposures_per_image']), num_pulses)
         accs, frames = self.model.calc_frames_and_accs(num_pulses, DEFAULT_MAX_NUM_PIMAX_ACCS, PIMAX_FACTOR,
-                                                       DEFAULT_MAX_NUM_PIMAX_FRAMES)
+                                                       DEFAULT_MAX_NUM_PIMAX_FRAMES, DEFAULT_PULSE_FREQ)
         self.assertEqual(caget(lf_PVs['lf_get_accs']), accs)
         self.assertEqual(caget(lf_PVs['lf_get_frames']), frames)
 

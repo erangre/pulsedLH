@@ -214,10 +214,15 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.gate_manual_delay_sb.setValue(manual_gate_delay)
         self.log_file.close()
         self.toggle_pulse_control_btns(True)
+        self.did_pimax_saturate()
 
     def start_pulses_for_single_gate_delay(self, gate_delay):
+        if self.widget.measure_diffraction_cb.isChecked():
+            xrd_toggle = True
+        else:
+            xrd_toggle = False
         self.widget.gate_manual_delay_sb.setValue(gate_delay)
-        self.collect_info_for_log()
+        self.collect_info_for_log(xrd_toggle)
 
         time.sleep(0.1)
         if self.widget.measure_temperature_cb.isChecked():
@@ -229,17 +234,14 @@ class PulsedHeatingController(QtCore.QObject):
                 retval = msg.exec_()
                 if retval == QtWidgets.QMessageBox.No:
                     return
-            caput(lf_PVs['lf_acquire'], 1, wait=False)
+            caput(lf_PVs['lf_acquire'], 1, wait=False, timeout=300)
             t_toggle = True
         else:
             t_toggle = False
 
         time.sleep(0.1)
-        if self.widget.measure_diffraction_cb.isChecked():
-            caput(pil3_PVs['Acquire'], 1, wait=False)
-            xrd_toggle = True
-        else:
-            xrd_toggle = False
+        if xrd_toggle:
+            caput(pil3_PVs['Acquire'], 1, wait=False, timeout=300)
 
         time.sleep(0.1)
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
@@ -408,7 +410,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.widget.ds_us_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
         self.widget.gate_manual_delay_sb.setSingleStep(float(manual_delay_step_btn.text()))
 
-    def collect_info_for_log(self):
+    def collect_info_for_log(self, xrd_toggle=True):
         self.log_info['date_time'] = time.asctime().replace(' ', '_')
         self.log_info['ds_percent'] = '{0:.2f}'.format(caget(laser_PVs['ds_laser_percent']))
         self.log_info['us_percent'] = '{0:.2f}'.format(caget(laser_PVs['us_laser_percent']))
@@ -426,8 +428,9 @@ class PulsedHeatingController(QtCore.QObject):
         self.log_info['t_exp_time_per_frame'] = '{0:.6f}'.format(self.log_info['pulse_width'] *
                                                                  self.log_info['num_t_accumulations'])
         self.log_info['shutter'] = caget(general_PVs['laser_shutter_status'])
-        self.log_info['xrd_exp_time'] = '{0:.4f}'.format(self.log_info['pulse_width'] *
-                                                         caget(pil3_PVs['exposures_per_image']))
+        if xrd_toggle:
+            self.log_info['xrd_exp_time'] = '{0:.4f}'.format(self.log_info['pulse_width'] *
+                                                             caget(pil3_PVs['exposures_per_image']))
 
     def collect_xrd_and_t_info_for_log(self, xrd=False, temperature=False):
         if not xrd:
@@ -483,8 +486,9 @@ class PulsedHeatingController(QtCore.QObject):
             self.first_run = False
         caput(general_PVs['laser_shutter_control'], general_values['laser_shutter_blocking'], wait=True)
         time.sleep(1.0)
-        caput(pil3_PVs['Acquire'], 1, wait=False)
+        caput(pil3_PVs['Acquire'], 1, wait=False, timeout=300)
         caput(pulse_PVs['BNC_mode'], pulse_values['BNC_BURST'], wait=True)
+        time.sleep(0.1)
         self.collect_info_for_log()
 
         bnc_run_thread = Thread(target=self.start_pulses_on_thread)
@@ -564,3 +568,13 @@ class PulsedHeatingController(QtCore.QObject):
             caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_in'], wait=True)
         time.sleep(0.2)
         self.update_alignment_slides_status()
+
+    def did_pimax_saturate(self):
+        gate_width = float(self.main_widget.config_widget.pimax_gate_width_le.text())
+        pimax_gate_width = caget(lf_PVs['lf_gate_width'], as_string=False)
+        if pimax_gate_width < gate_width:
+            caput_lf(lf_PVs['lf_gate_width'], gate_width, wait=True)
+            msg = QtWidgets.QMessageBox()
+            msg.setText("PIMAX saturated. Please lower the number of PIMAX accumulations")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            retval = msg.exec_()

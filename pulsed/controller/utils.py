@@ -20,9 +20,9 @@ def caput_lf(pv, value, wait=True):
     return False
 
 
-def caput_pil3(pv, value, wait=True):
+def caput_pil3(pv, value, wait=True, timeout=300):
     t0 = time.time()
-    caput(pv, value, wait=wait)
+    caput(pv, value, wait=wait, timeout=timeout)
 
     while time.time() - t0 < 20.0:
         time.sleep(0.02)

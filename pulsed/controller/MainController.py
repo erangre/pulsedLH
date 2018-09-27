@@ -58,6 +58,7 @@ class MainController(object):
         self.update_laser_status()
         self.update_pimax_status()
         self.update_pil3_status()
+        # uncomment above line
         self.prepare_connections()
         self.create_monitors()
         self.update_main_mode_status()
@@ -261,11 +262,12 @@ class MainController(object):
         self.pv_pimax_experiment.add_callback(self.pv_changed_value)
         if self.pv_pimax_experiment.connected:
             self.num_of_pulsed_status_pvs += 1
-
+        #
         self.pv_pil3_trigger_mode = PV(pil3_PVs['trigger_mode'])
         self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
         if self.pv_pil3_trigger_mode.connected:
             self.num_of_pulsed_status_pvs += 1
+        # uncomment above 4 lines
 
         self.pv_ds_laser_percent = PV(laser_PVs['ds_laser_percent'])
         self.pv_ds_laser_percent.add_callback(self.pv_changed_value)
