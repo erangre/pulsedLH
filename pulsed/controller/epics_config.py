@@ -123,7 +123,7 @@ lf_values = {
     'lf_image_mode_background': 2,
 }
 
-pil3_prefix = '13PIL300K:cam1:'
+pil3_prefix = '13PIL3:cam1:'
 
 pil3_PVs = {
     'trigger_mode': pil3_prefix + 'TriggerMode',
@@ -141,20 +141,21 @@ pil3_values = {
     'status_message_ok': 'OK',
 }
 
-pilw_prefix = '13PIL3:cam1:'
-
-pilw_PVs = {
-    'trigger_mode': pilw_prefix + 'TriggerMode',
-    'exposures_per_image': pilw_prefix + 'NumExposures',
-    'exposure_time': pilw_prefix + 'AcquireTime',
-    'threshold_apply': pilw_prefix + 'ThresholdApply',
-    'status_message': pilw_prefix + 'StatusMessage_RBV',
-    'Acquire': pilw_prefix + 'Acquire',
-    'file_name': pilw_prefix.replace('cam1', 'TIFF1') + 'FullFileName_RBV',
-}
-
-pilw_values = {
-    'trigger_external_enable': 1,
-    'trigger_internal': 0,
-    'status_message_ok': 'OK',
-}
+# ignore this so far:
+# pilw_prefix = '13PIL3:cam1:'
+#
+# pilw_PVs = {
+#     'trigger_mode': pilw_prefix + 'TriggerMode',
+#     'exposures_per_image': pilw_prefix + 'NumExposures',
+#     'exposure_time': pilw_prefix + 'AcquireTime',
+#     'threshold_apply': pilw_prefix + 'ThresholdApply',
+#     'status_message': pilw_prefix + 'StatusMessage_RBV',
+#     'Acquire': pilw_prefix + 'Acquire',
+#     'file_name': pilw_prefix.replace('cam1', 'TIFF1') + 'FullFileName_RBV',
+# }
+#
+# pilw_values = {
+#     'trigger_external_enable': 1,
+#     'trigger_internal': 0,
+#     'status_message_ok': 'OK',
+# }
