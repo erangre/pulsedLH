@@ -13,7 +13,10 @@ pulse_PVs = {
     'BNC_T1_enable': bnc_prefix + 'P1:State',
     'BNC_T2_enable': bnc_prefix + 'P2:State',
     'BNC_T4_enable': bnc_prefix + 'P4:State',
-    'BNC_burst_count': bnc_prefix + 'BurstCount'
+    'BNC_burst_count': bnc_prefix + 'BurstCount',
+    'BNC_T1_Amplitude': bnc_prefix + 'P1:Amplitude',
+    'BNC_T2_Amplitude': bnc_prefix + 'P2:Amplitude',
+    'BNC_T4_Amplitude': bnc_prefix + 'P4:Amplitude',
 }
 
 pulse_values = {
@@ -23,6 +26,8 @@ pulse_values = {
     'BNC_NORMAL': 0,
     'BNC_ENABLE': 1,
     'BNC_DISABLE': 0,
+    'DETECTOR_GATE_AMPLITUDE': 7.0,
+    'LASER_GATE_AMPLITUDE': 10.0,
 }
 
 unidig1_prefix = "13IDD:Unidig1"

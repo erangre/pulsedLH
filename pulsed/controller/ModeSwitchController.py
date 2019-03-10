@@ -56,6 +56,7 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        caput(pulse_PVs['BNC_T1_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
 
     def ds_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching DS laser to normal mode. Please Wait')
@@ -87,6 +88,7 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        caput(pulse_PVs['BNC_T2_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
 
     def us_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching US laser to normal mode. Please Wait')
@@ -116,6 +118,7 @@ class ModeSwitchController(QtCore.QObject):
 
     def pimax_to_pulsed_btn_clicked(self):
         self.display_mode_switch_status('Switching PIMAX to pulsed mode. Please Wait')
+        caput(pulse_PVs['BNC_T4_Amplitude'], pulse_values['DETECTOR_GATE_AMPLITUDE'])
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
         caput_lf(lf_PVs['lf_set_experiment'], lf_values['PIMAX_pulsed'], wait=True)
         caput_lf(lf_PVs['lf_set_bg_file_name'], lf_values['PIMAX_pulsed_bg_file_name'], wait=True)
@@ -144,11 +147,12 @@ class ModeSwitchController(QtCore.QObject):
     def pil3_to_pulsed_btn_clicked(self):
         self.display_mode_switch_status('Switching Pilatus to pulsed mode. Please Wait')
         self.old_settings['pilatus_exposure_time'] = caget(pil3_PVs['exposure_time'])
+        caput(pulse_PVs['BNC_T4_Amplitude'], pulse_values['DETECTOR_GATE_AMPLITUDE'])
         caput_pil3(pil3_PVs['trigger_mode'], pil3_values['trigger_external_enable'])
         num_pulses = self.widget.config_widget.num_pulses_sb.value()
         caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
         caput_pil3(pil3_PVs['threshold_apply'], 1)
-        caput_pil3(pil3_PVs['exposure_time'], 1E-6)  # TODO - read this from config tab
+        # caput_pil3(pil3_PVs['exposure_time'], 1E-6)  # TODO - read this from config tab. looks like this is not important when using external enable
         caput_pil3(pil3_PVs['threshold_apply'], 1)
         caput_pil3(general_PVs['pilatus_gate_control'], general_values['pilatus_gate_control_BNC'])
         self.widget.main_status.setText(self.previous_status)
