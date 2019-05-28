@@ -570,7 +570,7 @@ class PulsedHeatingController(QtCore.QObject):
         self.update_alignment_slides_status()
 
     def did_pimax_saturate(self):
-        gate_width = float(self.main_widget.config_widget.pimax_gate_width_le.text())
+        gate_width = float(self.main_widget.config_widget.pimax_gate_width_le.text())*1E-6
         pimax_gate_width = caget(lf_PVs['lf_gate_width'], as_string=False)
         if pimax_gate_width < gate_width:
             caput_lf(lf_PVs['lf_gate_width'], gate_width, wait=True)
