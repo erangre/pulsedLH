@@ -103,8 +103,10 @@ class PulsedHeatingController(QtCore.QObject):
             caput(pulse_PVs['BNC_T2_enable'], pulse_values['BNC_DISABLE'])
 
     def laser_percent_tweak_le_editing_finished(self):
-        caput(laser_PVs['ds_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)
-        caput(laser_PVs['us_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)
+        if caget(laser_PVs['ds_modulation_status']) == 1:
+            caput(laser_PVs['ds_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)
+        if caget(laser_PVs['us_modulation_status']) == 1:
+            caput(laser_PVs['us_laser_percent_tweak'], float(self.widget.laser_percent_tweak_le.text()), wait=True)
 
     def ds_increase_percent_btn_clicked(self):
         inc_pv = laser_PVs['ds_laser_percent_tweak'].replace('Val', '.B')

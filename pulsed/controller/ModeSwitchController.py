@@ -63,6 +63,7 @@ class ModeSwitchController(QtCore.QObject):
         t0 = time.time()
         caput(laser_PVs['ds_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['ds_disable_modulation'], 1, wait=True)
+        caput(laser_PVs['ds_laser_percent'], 0, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
                 self.widget.main_status.setText(self.previous_status)
@@ -95,6 +96,7 @@ class ModeSwitchController(QtCore.QObject):
         t0 = time.time()
         caput(laser_PVs['us_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['us_disable_modulation'], 1, wait=True)
+        caput(laser_PVs['us_laser_percent'], 0, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
                 self.widget.main_status.setText(self.previous_status)
