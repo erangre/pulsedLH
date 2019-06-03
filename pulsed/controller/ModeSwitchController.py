@@ -44,6 +44,7 @@ class ModeSwitchController(QtCore.QObject):
         self.widget.mode_switch_widget.all_to_normal_btn.clicked.connect(self.all_to_normal_btn_clicked)
 
     def ds_laser_pulsed_btn_clicked(self):
+        caput(pulse_PVs['BNC_T1_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
         self.display_mode_switch_status('Switching DS laser to pulsed mode. Please Wait')
         t0 = time.time()
         caput(laser_PVs['ds_enable_modulation'], 1, wait=True)
@@ -56,7 +57,6 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
-        caput(pulse_PVs['BNC_T1_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
 
     def ds_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching DS laser to normal mode. Please Wait')
@@ -76,6 +76,7 @@ class ModeSwitchController(QtCore.QObject):
         self.widget.main_status.setText(self.previous_status)
 
     def us_laser_pulsed_btn_clicked(self):
+        caput(pulse_PVs['BNC_T2_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
         self.display_mode_switch_status('Switching US laser to pulsed mode. Please Wait')
         t0 = time.time()
         caput(laser_PVs['us_enable_modulation'], 1, wait=True)
@@ -89,7 +90,6 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
-        caput(pulse_PVs['BNC_T2_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
 
     def us_laser_normal_btn_clicked(self):
         self.display_mode_switch_status('Switching US laser to normal mode. Please Wait')

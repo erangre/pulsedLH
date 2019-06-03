@@ -5,7 +5,7 @@ from sys import platform as _platform
 from qtpy import QtWidgets, QtCore, QtGui
 from functools import partial
 try:
-    from epics import caget, caput, PV
+    from epics import caget, caput, PV, get_pv
 except ImportError:
     exit(2)
 
@@ -31,12 +31,12 @@ PIL3_STATUS_PULSED = 'Pulsed'
 PIL3_STATUS_NORMAL = 'Normal'
 
 
-class MainController(object):
+class MainController(QtCore.QObject):
 
-    # pv_changed = QtCore.Signal(dict)
+    pv_changed = QtCore.Signal(dict)
 
     def __init__(self, use_settings=True, settings_directory='default'):
-        # super(MainController, self).__init__()
+        super(MainController, self).__init__()
         self.use_settings = use_settings
         self.callbacks = {}
         self.widget = MainWidget()
@@ -84,7 +84,7 @@ class MainController(object):
         self.widget.configuration_btn.clicked.connect(self.switch_tabs)
         self.pulsed_heating_controller.pulse_running.connect(self.pulse_running_signal_emitted)
         self.pulsed_heating_controller.prepare_pulses.connect(self.prepare_pulses_signal_emitted)
-        # self.pv_changed.connect(self.pv_changed_emitted)
+        self.pv_changed.connect(self.pv_changed_emitted)
         self.mode_switch_controller.pimax_mode_changed.connect(self.config_controller.update_lf_settings)
         self.callbacks[pulse_PVs['BNC_run']] = self.update_main_status
         self.callbacks[laser_PVs['ds_emission_status']] = self.update_ds_laser_emission_status
@@ -234,23 +234,23 @@ class MainController(object):
         self.widget.fix_sizes()
 
     def create_monitors(self):
-        self.pv_bnc_running = PV(pulse_PVs['BNC_run'])
+        self.pv_bnc_running = get_pv(pulse_PVs['BNC_run'])
         self.pv_bnc_running.add_callback(self.pv_changed_value)
 
-        self.pv_ds_laser_emission = PV(laser_PVs['ds_emission_status'])
+        self.pv_ds_laser_emission = get_pv(laser_PVs['ds_emission_status'])
         self.pv_ds_laser_emission.add_callback(self.pv_changed_value)
-        self.pv_us_laser_emission = PV(laser_PVs['us_emission_status'])
+        self.pv_us_laser_emission = get_pv(laser_PVs['us_emission_status'])
         self.pv_us_laser_emission.add_callback(self.pv_changed_value)
 
-        self.pv_ds_laser_modulation = PV(laser_PVs['ds_modulation_status'])
+        self.pv_ds_laser_modulation = get_pv(laser_PVs['ds_modulation_status'])
         self.pv_ds_laser_modulation.add_callback(self.pv_changed_value)
-        self.pv_us_laser_modulation = PV(laser_PVs['us_modulation_status'])
+        self.pv_us_laser_modulation = get_pv(laser_PVs['us_modulation_status'])
         self.pv_us_laser_modulation.add_callback(self.pv_changed_value)
 
-        self.pv_ds_laser_current = PV(laser_PVs['ds_diode_current'])
+        self.pv_ds_laser_current = get_pv(laser_PVs['ds_diode_current'])
         self.pv_ds_laser_current.add_callback(self.pv_changed_value)
 
-        self.pv_us_laser_current = PV(laser_PVs['us_diode_current'])
+        self.pv_us_laser_current = get_pv(laser_PVs['us_diode_current'])
         self.pv_us_laser_current.add_callback(self.pv_changed_value)
 
         if self.pv_ds_laser_modulation.connected:
@@ -258,36 +258,38 @@ class MainController(object):
         if self.pv_us_laser_modulation.connected:
             self.num_of_pulsed_status_pvs += 1
 
-        self.pv_pimax_experiment = PV(lf_PVs['lf_get_experiment'])
+        self.pv_pimax_experiment = get_pv(lf_PVs['lf_get_experiment'])
         self.pv_pimax_experiment.add_callback(self.pv_changed_value)
         if self.pv_pimax_experiment.connected:
             self.num_of_pulsed_status_pvs += 1
         #
-        self.pv_pil3_trigger_mode = PV(pil3_PVs['trigger_mode'])
+        self.pv_pil3_trigger_mode = get_pv(pil3_PVs['trigger_mode'])
         self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
         if self.pv_pil3_trigger_mode.connected:
             self.num_of_pulsed_status_pvs += 1
         # uncomment above 4 lines
 
-        self.pv_ds_laser_percent = PV(laser_PVs['ds_laser_percent'])
+        self.pv_ds_laser_percent = get_pv(laser_PVs['ds_laser_percent'])
         self.pv_ds_laser_percent.add_callback(self.pv_changed_value)
 
-        self.pv_us_laser_percent = PV(laser_PVs['us_laser_percent'])
+        self.pv_us_laser_percent = get_pv(laser_PVs['us_laser_percent'])
         self.pv_us_laser_percent.add_callback(self.pv_changed_value)
 
     def pv_changed_value(self, **kwargs):
+        self.pv_changed.emit(kwargs)
+        # current_callback = self.callbacks[kwargs.get('pvname', None)]
+        # if current_callback:
+        #     current_callback(kwargs.get('value', None), kwargs.get('char_value', None))
+
+    def pv_changed_emitted(self, kwargs):
+        # print(kwargs['pvname'], ' PV emitted. new value is: ', kwargs['value'], ' and in string ', kwargs['char_value'])
+        # print("signal emitted")
         current_callback = self.callbacks[kwargs.get('pvname', None)]
         if current_callback:
             current_callback(kwargs.get('value', None), kwargs.get('char_value', None))
-
-    # def pv_changed_emitted(self, kwargs):
-    #     print("signal emitted")
-    #     current_callback = self.callbacks[kwargs.get('pvname', None)]
-    #     if current_callback:
-    #         current_callback(kwargs.get('value', None))
-    #     print(kwargs['pvname'])
-    #     print(kwargs['value'])
-    #     print(kwargs['char_value'])
+        # print(kwargs['pvname'])
+        # print(kwargs['value'])
+        # print(kwargs['char_value'])
 
     def pulse_running_signal_emitted(self, *kargs):
         partial(self.config_controller.toggle_config_btns, not(kargs[0]))()
