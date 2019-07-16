@@ -53,8 +53,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
             self.manual_delay_step_button_group.addButton(manual_delay_step_btn)
         self.manual_delay_step_size_1_btn.setChecked(True)
 
-        self.ds_us_manual_delay_lbl = QtWidgets.QLabel('DS-->US delay, \xB5s')
-        self.gate_manual_delay_lbl = QtWidgets.QLabel('Gate delay, \xB5s')
+        self.ds_us_manual_delay_lbl = QtWidgets.QLabel('DS delay, \xB5s')
+        self.gate_manual_delay_lbl = QtWidgets.QLabel('Gate (US) delay, \xB5s')
         self.ds_us_manual_delay_sb = QtWidgets.QDoubleSpinBox()
         self.gate_manual_delay_sb = QtWidgets.QDoubleSpinBox()
 
@@ -109,8 +109,6 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.ds_delay_le, 7, 0, 1, 2)
         self._grid_layout.addWidget(self.delay_lbl, 7, 2, 1, 4)
         self._grid_layout.addWidget(self.us_delay_le, 7, 6, 1, 2)
-        self._grid_layout.addWidget(self.ds_us_manual_delay_lbl, 8, 0, 1, 1)
-        self._grid_layout.addWidget(self.ds_us_manual_delay_sb, 8, 1, 1, 1)
         self._grid_layout.addWidget(self.manual_delay_step_size_1_btn, 8, 2, 1, 1)
         self._grid_layout.addWidget(self.manual_delay_step_size_0p1_btn, 8, 3, 1, 1)
         self._grid_layout.addWidget(self.manual_delay_step_size_0p01_btn, 8, 4, 1, 1)
@@ -121,6 +119,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self._grid_layout.addWidget(self.measure_diffraction_cb, 9, 1, 1, 1)
         self._grid_layout.addWidget(self.collect_quenched_xrd_btn, 9, 2, 1, 2)
         self._grid_layout.addWidget(self.measure_t_background_btn, 9, 4, 1, 2)
+        self._grid_layout.addWidget(self.ds_us_manual_delay_lbl, 9, 6, 1, 1)
+        self._grid_layout.addWidget(self.ds_us_manual_delay_sb, 9, 7, 1, 1)
         self._grid_layout.addWidget(self.last_xrd_file_lbl, 10, 0, 1, 1)
         self._grid_layout.addWidget(self.last_xrd_file_le, 10, 1, 1, 3)
         self._grid_layout.addWidget(self.last_t_file_lbl, 10, 4, 1, 1)
@@ -187,6 +187,8 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.manual_delay_step_size_1_btn.setCheckable(True)
         self.manual_delay_step_size_0p001_btn.setCheckable(True)
         self.manual_delay_step_size_0p01_btn.setCheckable(True)
+        self.ds_enable_pulses_cb.setStyleSheet("font: bold 16px; color: blue;")
+        self.us_enable_pulses_cb.setStyleSheet("font: bold 16px; color: blue;")
 
     def set_tool_tips_for_widgets(self):
         self.force_alignment_slides_in_cb.setToolTip("When checked, glass alignment slides will remain in during "
@@ -207,6 +209,15 @@ class PulsedHeatingWidget(QtWidgets.QGroupBox):
         self.ds_width_le.setText(str(round(timings['width_t1'] * 1E6, 3)))
         self.us_width_le.setText(str(round(timings['width_t2'] * 1E6, 3)))
 
+    # def move_gate_delay_btn(self, stream):
+    #     self._grid_layout.removeWidget(self.ds_us_manual_delay_sb)
+    #     self._grid_layout.removeWidget(self.gate_manual_delay_sb)
+    #     if stream == 'US':
+    #         self._grid_layout.addWidget(self.gate_manual_delay_sb, 8, 1, 1, 1)
+    #         self._grid_layout.addWidget(self.ds_us_manual_delay_sb, 8, 7, 1, 1)
+    #     elif stream == 'DS':
+    #         self._grid_layout.addWidget(self.ds_us_manual_delay_sb, 8, 1, 1, 1)
+    #         self._grid_layout.addWidget(self.gate_manual_delay_sb, 8, 7, 1, 1)
 
 class MultiGateWidget(QtWidgets.QGroupBox):
     def __init__(self, *args, **kwargs):

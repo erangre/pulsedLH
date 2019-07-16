@@ -93,14 +93,18 @@ class PulsedHeatingController(QtCore.QObject):
     def ds_enable_pulses_cb_changed(self):
         if self.widget.ds_enable_pulses_cb.isChecked():
             caput(pulse_PVs['BNC_T1_enable'], pulse_values['BNC_ENABLE'])
+            self.widget.ds_enable_pulses_cb.setStyleSheet("font: bold 16px; color: blue;")
         else:
             caput(pulse_PVs['BNC_T1_enable'], pulse_values['BNC_DISABLE'])
+            self.widget.ds_enable_pulses_cb.setStyleSheet("font: normal 11px; color: black;")
 
     def us_enable_pulses_cb_changed(self):
         if self.widget.us_enable_pulses_cb.isChecked():
             caput(pulse_PVs['BNC_T2_enable'], pulse_values['BNC_ENABLE'])
+            self.widget.us_enable_pulses_cb.setStyleSheet("font: bold 16px; color: blue;")
         else:
             caput(pulse_PVs['BNC_T2_enable'], pulse_values['BNC_DISABLE'])
+            self.widget.us_enable_pulses_cb.setStyleSheet("font: normal 11px; color: black;")
 
     def laser_percent_tweak_le_editing_finished(self):
         if caget(laser_PVs['ds_modulation_status']) == 1:
@@ -334,6 +338,15 @@ class PulsedHeatingController(QtCore.QObject):
             ds_percent = 10.0
         timings = self.model.calc_all_delays_and_widths(f, w, ds_percent, us_percent, ds_us_manual_delay,
                                                         gate_manual_delay)
+        if timings['delay_t1']:
+            # self.widget.move_gate_delay_btn('US')
+            self.widget.ds_us_manual_delay_lbl.setText('DS delay, \xB5s')
+            self.widget.gate_manual_delay_lbl.setText('Gate (US) delay, \xB5s')
+        elif timings['delay_t2']:
+            # self.widget.move_gate_delay_btn('DS')
+            self.widget.ds_us_manual_delay_lbl.setText('US delay, \xB5s')
+            self.widget.gate_manual_delay_lbl.setText('Gate (DS) delay, \xB5s')
+
         caput(pulse_PVs['BNC_T1_delay'], timings['delay_t1'], wait=True)
         caput(pulse_PVs['BNC_T2_delay'], timings['delay_t2'], wait=True)
         caput(pulse_PVs['BNC_T4_delay'], timings['delay_t4'], wait=True)

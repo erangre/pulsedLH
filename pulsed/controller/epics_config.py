@@ -45,6 +45,7 @@ general_PVs = {
     'ds_light_status': unidig1_prefix + 'Bi22.VAL',
     'us_light_control': unidig1_prefix + 'Bo20',
     'us_light_status': unidig1_prefix + 'Bi20.VAL',
+    'laser_enable_control': '13IDD:LaserPLC:UserModeEnableRequest',
 }
 
 general_values = {

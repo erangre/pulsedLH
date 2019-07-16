@@ -44,9 +44,17 @@ class ModeSwitchController(QtCore.QObject):
         self.widget.mode_switch_widget.all_to_normal_btn.clicked.connect(self.all_to_normal_btn_clicked)
 
     def ds_laser_pulsed_btn_clicked(self):
+        # caput(general_PVs['laser_enable_control'], 0, wait=True)
+        # time.sleep(0.5)
         caput(pulse_PVs['BNC_T1_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
         self.display_mode_switch_status('Switching DS laser to pulsed mode. Please Wait')
         t0 = time.time()
+        if caget(laser_PVs['ds_emission_status'], as_string=False) == 1:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Cannot switch DS laser to pulsed mode. Make sure emission is off.")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
         caput(laser_PVs['ds_enable_modulation'], 1, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_enabled']:
@@ -57,28 +65,46 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        # caput(general_PVs['laser_enable_control'], 1, wait=True)
 
     def ds_laser_normal_btn_clicked(self):
+        # caput(general_PVs['laser_enable_control'], 0, wait=True)
+        # time.sleep(0.5)
         self.display_mode_switch_status('Switching DS laser to normal mode. Please Wait')
         t0 = time.time()
+        if caget(laser_PVs['ds_emission_status'], as_string=False) == 1:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Cannot switch DS laser to pulsed mode. Make sure emission is off.")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
         caput(laser_PVs['ds_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['ds_disable_modulation'], 1, wait=True)
         caput(laser_PVs['ds_laser_percent'], 0, wait=True)
+        caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_out'])
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_disabled']:
                 self.widget.main_status.setText(self.previous_status)
                 return
-
         msg = QtWidgets.QMessageBox()
         msg.setText("Cannot switch DS laser to normal mode. Make sure emission is off.")
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        # caput(general_PVs['laser_enable_control'], 1, wait=True)
 
     def us_laser_pulsed_btn_clicked(self):
+        # caput(general_PVs['laser_enable_control'], 0, wait=True)
+        # time.sleep(0.5)
         caput(pulse_PVs['BNC_T2_Amplitude'], pulse_values['LASER_GATE_AMPLITUDE'])
         self.display_mode_switch_status('Switching US laser to pulsed mode. Please Wait')
         t0 = time.time()
+        if caget(laser_PVs['us_emission_status'], as_string=False) == 1:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Cannot switch US laser to pulsed mode. Make sure emission is off.")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
         caput(laser_PVs['us_enable_modulation'], 1, wait=True)
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_enabled']:
@@ -90,13 +116,23 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        # caput(general_PVs['laser_enable_control'], 1, wait=True)
 
     def us_laser_normal_btn_clicked(self):
+        # caput(general_PVs['laser_enable_control'], 0, wait=True)
+        # time.sleep(0.5)
         self.display_mode_switch_status('Switching US laser to normal mode. Please Wait')
         t0 = time.time()
+        if caget(laser_PVs['us_emission_status'], as_string=False) == 1:
+            msg = QtWidgets.QMessageBox()
+            msg.setText("Cannot switch US laser to pulsed mode. Make sure emission is off.")
+            msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
+            msg.exec_()
+            return
         caput(laser_PVs['us_laser_percent_tweak'], 0.1, wait=True)
         caput(laser_PVs['us_disable_modulation'], 1, wait=True)
         caput(laser_PVs['us_laser_percent'], 0, wait=True)
+        caput(general_PVs['laser_glass_slides_control'], general_values['laser_glass_slides_out'])
         while time.time() - t0 < 5.0:
             if caget(laser_PVs['us_modulation_status']) == laser_values['modulation_disabled']:
                 self.widget.main_status.setText(self.previous_status)
@@ -106,6 +142,7 @@ class ModeSwitchController(QtCore.QObject):
         msg.setStandardButtons(QtWidgets.QMessageBox.Ok)
         msg.exec_()
         self.widget.main_status.setText(self.previous_status)
+        # caput(general_PVs['laser_enable_control'], 1, wait=True)
 
     def update_laser_btns_state(self):
         if caget(laser_PVs['ds_modulation_status']) == laser_values['modulation_enabled']:
