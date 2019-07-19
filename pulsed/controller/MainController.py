@@ -14,6 +14,7 @@ from .ModeSwitchController import ModeSwitchController
 from .PulsedHeatingController import PulsedHeatingController
 from .ConfigController import ConfigController
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values
+from .epics_config import PILATUS_OFFLINE, PIMAX_OFFLINE
 from .utils import caput_lf
 
 MAIN_STATUS_OFF = 'Stopped'
@@ -56,8 +57,10 @@ class MainController(QtCore.QObject):
 
         self.update_main_status()
         self.update_laser_status()
-        self.update_pimax_status()
-        self.update_pil3_status()
+        if not PIMAX_OFFLINE:
+            self.update_pimax_status()
+        if not PILATUS_OFFLINE:
+            self.update_pil3_status()
         # uncomment above line
         self.prepare_connections()
         self.create_monitors()
@@ -257,16 +260,17 @@ class MainController(QtCore.QObject):
             self.num_of_pulsed_status_pvs += 1
         if self.pv_us_laser_modulation.connected:
             self.num_of_pulsed_status_pvs += 1
+        if not PIMAX_OFFLINE:
+            self.pv_pimax_experiment = get_pv(lf_PVs['lf_get_experiment'])
+            self.pv_pimax_experiment.add_callback(self.pv_changed_value)
+            if self.pv_pimax_experiment.connected:
+                self.num_of_pulsed_status_pvs += 1
 
-        self.pv_pimax_experiment = get_pv(lf_PVs['lf_get_experiment'])
-        self.pv_pimax_experiment.add_callback(self.pv_changed_value)
-        if self.pv_pimax_experiment.connected:
-            self.num_of_pulsed_status_pvs += 1
-        #
-        self.pv_pil3_trigger_mode = get_pv(pil3_PVs['trigger_mode'])
-        self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
-        if self.pv_pil3_trigger_mode.connected:
-            self.num_of_pulsed_status_pvs += 1
+        if not PILATUS_OFFLINE:
+            self.pv_pil3_trigger_mode = get_pv(pil3_PVs['trigger_mode'])
+            self.pv_pil3_trigger_mode.add_callback(self.pv_changed_value)
+            if self.pv_pil3_trigger_mode.connected:
+                self.num_of_pulsed_status_pvs += 1
         # uncomment above 4 lines
 
         self.pv_ds_laser_percent = get_pv(laser_PVs['ds_laser_percent'])

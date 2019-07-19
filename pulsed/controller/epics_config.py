@@ -1,3 +1,24 @@
+PIMAX_OFFLINE = True
+PILATUS_OFFLINE = True
+
+pil3_prefix = '13PIL3:cam1:'
+
+pil3_PVs = {
+    'trigger_mode': pil3_prefix + 'TriggerMode',
+    'exposures_per_image': pil3_prefix + 'NumExposures',
+    'exposure_time': pil3_prefix + 'AcquireTime',
+    'threshold_apply': pil3_prefix + 'ThresholdApply',
+    'status_message': pil3_prefix + 'StatusMessage_RBV',
+    'Acquire': pil3_prefix + 'Acquire',
+    'file_name': pil3_prefix.replace('cam1', 'TIFF1') + 'FullFileName_RBV',
+}
+
+pil3_values = {
+    'trigger_external_enable': 1,
+    'trigger_internal': 0,
+    'status_message_ok': 'OK',
+}
+
 bnc_prefix = '13IDD:BNC1:'
 
 pulse_PVs = {
@@ -127,24 +148,6 @@ lf_values = {
     'PIMAX_trigger_external': 1,
     'lf_image_mode_normal': 0,
     'lf_image_mode_background': 2,
-}
-
-pil3_prefix = '13PIL3:cam1:'
-
-pil3_PVs = {
-    'trigger_mode': pil3_prefix + 'TriggerMode',
-    'exposures_per_image': pil3_prefix + 'NumExposures',
-    'exposure_time': pil3_prefix + 'AcquireTime',
-    'threshold_apply': pil3_prefix + 'ThresholdApply',
-    'status_message': pil3_prefix + 'StatusMessage_RBV',
-    'Acquire': pil3_prefix + 'Acquire',
-    'file_name': pil3_prefix.replace('cam1', 'TIFF1') + 'FullFileName_RBV',
-}
-
-pil3_values = {
-    'trigger_external_enable': 1,
-    'trigger_internal': 0,
-    'status_message_ok': 'OK',
 }
 
 # ignore this so far:

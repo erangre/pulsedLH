@@ -12,7 +12,7 @@ except ImportError:
 from ..widgets.MainWidget import MainWidget
 from .utils import caput_lf, caput_pil3
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values, \
-    general_PVs, general_values
+    general_PVs, general_values, PIMAX_OFFLINE, PILATUS_OFFLINE
 from ..model.ConfigModel import ConfigModel
 
 DEFAULT_NUM_PULSES = 100000
@@ -64,10 +64,13 @@ class ConfigController(object):
     def num_pulses_sb_changed(self):
         num_pulses = self.widget.num_pulses_sb.value()
         caput(pulse_PVs['BNC_burst_count'], num_pulses * PULSE_FACTOR)
-        if caget(lf_PVs['lf_get_trigger_mode']) == lf_values['PIMAX_trigger_external']:
-            self.update_lf_settings(num_pulses)
-        if caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_external_enable']:
-            caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
+        if not PIMAX_OFFLINE:
+            if caget(lf_PVs['lf_get_trigger_mode']) == lf_values['PIMAX_trigger_external']:
+                self.update_lf_settings(num_pulses)
+
+        if not PILATUS_OFFLINE:
+            if caget(pil3_PVs['trigger_mode']) == pil3_values['trigger_external_enable']:
+                caput_pil3(pil3_PVs['exposures_per_image'], num_pulses)
         # uncomment above
         self.main_widget.pulsed_laser_heating_widget.num_pulses_le.setText(str(num_pulses))
 

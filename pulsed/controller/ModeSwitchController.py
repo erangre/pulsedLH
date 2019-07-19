@@ -12,7 +12,7 @@ except ImportError:
 from ..widgets.MainWidget import MainWidget
 from .utils import caput_lf, caput_pil3
 from .epics_config import pulse_PVs, pulse_values, laser_PVs, laser_values, lf_PVs, lf_values, pil3_PVs, pil3_values, \
-    general_PVs, general_values
+    general_PVs, general_values, PILATUS_OFFLINE, PIMAX_OFFLINE
 
 
 class ModeSwitchController(QtCore.QObject):
@@ -29,7 +29,8 @@ class ModeSwitchController(QtCore.QObject):
         self.old_settings = {}
         self.prepare_connections()
         self.update_laser_btns_state()
-        self.update_pimax_btns_state()
+        if not PIMAX_OFFLINE:
+            self.update_pimax_btns_state()
 
     def prepare_connections(self):
         self.widget.mode_switch_widget.ds_laser_pulsed_btn.clicked.connect(self.ds_laser_pulsed_btn_clicked)
